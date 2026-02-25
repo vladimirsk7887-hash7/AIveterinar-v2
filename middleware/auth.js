@@ -24,7 +24,17 @@ export async function authMiddleware(req, res, next) {
       return res.status(401).json({ error: 'Invalid or expired token' });
     }
 
-    // Find clinic for this user
+    req.user = user;
+    req.token = token;
+
+    // Check if user is superadmin (superadmin doesn't need a clinic)
+    const superadminEmail = process.env.SUPERADMIN_EMAIL;
+    if (superadminEmail && user.email === superadminEmail) {
+      req.clinic = null; // Superadmin has no clinic
+      return next();
+    }
+
+    // Find clinic for regular users
     const { data: clinic, error: clinicError } = await supabaseAdmin
       .from('clinics')
       .select('*')
@@ -35,9 +45,7 @@ export async function authMiddleware(req, res, next) {
       return res.status(403).json({ error: 'No clinic associated with this account' });
     }
 
-    req.user = user;
     req.clinic = clinic;
-    req.token = token;
     next();
   } catch (err) {
     logger.error({ error: err.message }, 'Auth middleware error');
