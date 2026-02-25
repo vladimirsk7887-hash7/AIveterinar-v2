@@ -1,0 +1,179 @@
+# ═══════════════════════════════════════════════════════════
+# AI-ВЕТЕРИНАР SaaS — КОНФИГУРАЦИЯ ПЛАТФОРМЫ
+# ═══════════════════════════════════════════════════════════
+
+platform:
+  name: "AI-Ветеринар"
+  url: "https://aiveterinar.ru"
+  support_email: "support@aiveterinar.ru"
+
+# ─── AI ПРОВАЙДЕРЫ ───────────────────────────────────────
+ai:
+  default_provider: "routerai"
+  default_model: "deepseek/deepseek-chat-v3-0324"
+  max_completion_tokens: 1000
+
+  providers:
+    routerai:
+      enabled: true
+      base_url: "https://routerai.ru/api/v1"
+      models:
+        - id: "gpt-5.2"
+          name: "GPT-5.2"
+          input_cost_rub: 174
+          output_cost_rub: 1396
+        - id: "claude-sonnet-4-5-20250929"
+          name: "Claude Sonnet 4.5"
+          input_cost_rub: 299
+          output_cost_rub: 1496
+        - id: "deepseek/deepseek-chat-v3-0324"
+          name: "DeepSeek V3.2"
+          input_cost_rub: 25
+          output_cost_rub: 37
+
+    openrouter:
+      enabled: false
+      base_url: "https://openrouter.ai/api/v1"
+      proxy: ""
+      models:
+        - id: "openai/gpt-4o"
+          name: "GPT-4o (OpenRouter)"
+          input_cost_usd: 0.0025
+          output_cost_usd: 0.01
+
+    openai:
+      enabled: true
+      base_url: "https://api.openai.com/v1"
+      models:
+        - id: "gpt-4o"
+          name: "GPT-4o (Direct)"
+          input_cost_usd: 0.0025
+          output_cost_usd: 0.01
+
+# ─── ТАРИФЫ ──────────────────────────────────────────────
+tariffs:
+  - id: "trial"
+    name: "Пробный"
+    price_monthly_rub: 0
+    duration_days: 7
+    limits:
+      dialogs_per_month: 20
+      messages_per_dialog: 30
+      tokens_included: 500000
+      overage: "block"
+      tg_chats: 1
+      widgets: 1
+    features:
+      custom_branding: false
+      custom_prompt: false
+      analytics: "basic"
+      choose_provider: false
+
+  - id: "start"
+    name: "Старт"
+    price_monthly_rub: 299000
+    limits:
+      dialogs_per_month: 100
+      messages_per_dialog: 50
+      tokens_included: 2000000
+      overage: "block"
+      tg_chats: 1
+      widgets: 1
+    features:
+      custom_branding: true
+      custom_prompt: false
+      analytics: "basic"
+      choose_provider: false
+
+  - id: "business"
+    name: "Бизнес"
+    price_monthly_rub: 599000
+    limits:
+      dialogs_per_month: 500
+      messages_per_dialog: 100
+      tokens_included: 10000000
+      overage: "charge"
+      overage_cost_per_1k_rub: 3
+      hard_cap_rub: 3000000
+      tg_chats: 3
+      widgets: 3
+    features:
+      custom_branding: true
+      custom_prompt: true
+      analytics: "extended"
+      choose_provider: true
+
+  - id: "pro"
+    name: "Про"
+    price_monthly_rub: 999000
+    limits:
+      dialogs_per_month: 2000
+      messages_per_dialog: 200
+      tokens_included: 50000000
+      overage: "charge"
+      overage_cost_per_1k_rub: 1.5
+      hard_cap_rub: 10000000
+      tg_chats: 10
+      widgets: 10
+    features:
+      custom_branding: true
+      custom_prompt: true
+      analytics: "extended"
+      choose_provider: true
+      own_tg_bot: true
+
+# ─── ПЛАТЕЖИ ─────────────────────────────────────────────
+payments:
+  tg_stars:
+    enabled: false
+    star_to_rub: 1.7
+
+  yookassa:
+    enabled: false
+    webhook_path: "/api/webhooks/yookassa"
+    return_url: "https://aiveterinar.ru/admin/billing"
+
+  stripe:
+    enabled: false
+    webhook_path: "/api/webhooks/stripe"
+
+# ─── FSM ─────────────────────────────────────────────────
+fsm:
+  storage: "postgres"
+  redis:
+    url: ""
+
+# ─── ЛОГИРОВАНИЕ ─────────────────────────────────────────
+logging:
+  level: "info"
+  format: "json"
+  events:
+    log_to_db: true
+    retention_days: 90
+  tracked_events:
+    - "clinic.registered"
+    - "clinic.settings_updated"
+    - "conversation.started"
+    - "conversation.completed"
+    - "message.sent"
+    - "message.received"
+    - "appointment.created"
+    - "appointment.status_changed"
+    - "payment.initiated"
+    - "payment.completed"
+    - "payment.failed"
+    - "widget.loaded"
+    - "widget.chat_opened"
+    - "limit.reached"
+    - "error.ai_provider"
+    - "error.telegram"
+    - "error.payment"
+    - "setup.requested"
+  gc:
+    enabled: true
+    cron: "0 3 * * *"
+
+# ─── TELEGRAM ─────────────────────────────────────────────
+telegram:
+  message_max_length: 4000
+  parse_mode: "HTML"

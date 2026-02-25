@@ -1,124 +1,110 @@
 import express from 'express';
-import crypto from 'crypto';
+import helmet from 'helmet';
+import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { loadConfig } from './config/loader.js';
+import { createLogger } from './services/logger.js';
+import { setupEventListeners } from './services/events.js';
+import { startGarbageCollection } from './services/gc.js';
+import { requestId } from './middleware/requestId.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+// Load config first
+let config;
+try {
+  config = loadConfig();
+} catch (err) {
+  console.error('Failed to load config:', err.message);
+  process.exit(1);
+}
+
 const app = express();
 const PORT = process.env.PORT || 3000;
+const logger = createLogger();
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
-const TG_BOT_TOKEN = process.env.TG_BOT_TOKEN || '';
-const TG_CHAT_ID = process.env.TG_CHAT_ID || '-5263363292';
+// Trust nginx proxy (fixes X-Forwarded-For for rate limiting)
+app.set('trust proxy', 1);
 
+// ─── Global middleware ───
+app.use(helmet({ contentSecurityPolicy: false }));
+app.use(cors());
+app.use(requestId);
 app.use(express.json({ limit: '100kb' }));
-app.use(express.static(join(__dirname, 'dist')));
 
-// ─── Healthcheck ───
-app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', hasKey: !!OPENAI_API_KEY });
-});
+// ─── Static files (Vite build output) ───
+app.use(express.static(join(__dirname, 'dist'), { index: false }));
 
-// ─── OpenAI Chat Proxy ───
-app.post('/api/chat', async (req, res) => {
-  if (!OPENAI_API_KEY) {
-    return res.status(500).json({ error: 'OPENAI_API_KEY not configured' });
-  }
-  try {
-    const { messages, system, max_tokens } = req.body;
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-5.2',
-        max_completion_tokens: max_tokens || 1000,
-        messages: [
-          { role: 'system', content: system || 'You are a helpful assistant.' },
-          ...messages,
-        ],
-      }),
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      return res.status(response.status).json({ error: data.error?.message || 'OpenAI error' });
-    }
-    res.json({ text: data.choices?.[0]?.message?.content || '' });
-  } catch (err) {
-    console.error('Chat error:', err.message, err.cause || '');
-    res.status(500).json({ error: err.message || 'Server error' });
-  }
-});
+// ─── API Routes ───
+import healthRouter from './routes/health.js';
+app.use('/api', healthRouter);
 
-// ─── Telegram Send ───
-app.post('/api/telegram', async (req, res) => {
-  if (!TG_BOT_TOKEN) {
-    return res.status(500).json({ error: 'TG_BOT_TOKEN not configured' });
-  }
-  try {
-    const { text } = req.body;
-    if (!text) return res.status(400).json({ error: 'Missing text' });
+import legacyRouter from './routes/legacy.js';
+app.use('/api', legacyRouter);
 
-    const tgRes = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: TG_CHAT_ID,
-        text: text.slice(0, 4000),
-        parse_mode: 'HTML',
-      }),
-    });
-    const tgData = await tgRes.json();
-    if (!tgData.ok) {
-      return res.status(502).json({ error: tgData.description });
-    }
-    res.json({ success: true });
-  } catch {
-    res.status(500).json({ error: 'Telegram error' });
-  }
-});
+import widgetRouter from './routes/widget.js';
+app.use('/api/widget', widgetRouter);
 
-// ─── Telegram initData validation ───
-app.post('/api/validate-tg', (req, res) => {
-  if (!TG_BOT_TOKEN) {
-    return res.status(500).json({ error: 'TG_BOT_TOKEN not configured' });
-  }
-  const { initData } = req.body;
-  if (!initData) return res.status(400).json({ valid: false });
+import authRouter from './routes/auth.js';
+app.use('/api/auth', authRouter);
 
-  try {
-    const params = new URLSearchParams(initData);
-    const hash = params.get('hash');
-    params.delete('hash');
+import clinicRouter from './routes/clinic.js';
+app.use('/api/clinic', clinicRouter);
 
-    const dataCheckString = Array.from(params.entries())
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([k, v]) => `${k}=${v}`)
-      .join('\n');
+import paymentsRouter from './routes/payments.js';
+app.use('/api/payments', paymentsRouter);
 
-    const secretKey = crypto.createHmac('sha256', 'WebAppData').update(TG_BOT_TOKEN).digest();
-    const expected = crypto.createHmac('sha256', secretKey).update(dataCheckString).digest('hex');
+import webhooksRouter from './routes/webhooks.js';
+app.use('/api/webhooks', webhooksRouter);
 
-    res.json({ valid: hash === expected });
-  } catch {
-    res.json({ valid: false });
-  }
-});
+import adminRouter from './routes/admin.js';
+app.use('/api/admin', adminRouter);
 
-// ─── Mini App SPA fallback ───
-app.get('/tg/{*splat}', (_req, res) => {
-  res.sendFile(join(__dirname, 'dist', 'tg-mini-app.html'));
-});
+import tgWebhookRouter from './routes/tg-webhook.js';
+app.use('/api/tg-webhook', tgWebhookRouter);
 
-// ─── Main SPA fallback ───
-app.get('/{*splat}', (_req, res) => {
-  res.sendFile(join(__dirname, 'dist', 'index.html'));
-});
+// ─── SPA Fallbacks ───
+const sendAdmin = (_req, res) => res.sendFile(join(__dirname, 'dist', 'admin.html'));
+const sendSuper = (_req, res) => res.sendFile(join(__dirname, 'dist', 'superadmin.html'));
+const sendWidget = (_req, res) => res.sendFile(join(__dirname, 'dist', 'widget.html'));
+const sendTg = (_req, res) => res.sendFile(join(__dirname, 'dist', 'tg-mini-app.html'));
+const sendLanding = (_req, res) => res.sendFile(join(__dirname, 'dist', 'landing.html'));
 
+app.get('/admin', sendAdmin);
+app.get('/admin/{*splat}', sendAdmin);
+
+app.get('/super', sendSuper);
+app.get('/super/{*splat}', sendSuper);
+
+app.get('/widget/:slug', sendWidget);
+app.get('/widget/:slug/{*splat}', sendWidget);
+
+app.get('/tg', sendTg);
+app.get('/tg/{*splat}', sendTg);
+
+app.get('/landing', sendLanding);
+
+// Root: landing page
+app.get('/', sendLanding);
+
+// Demo app (old) for any other path
+app.get('/demo', (_req, res) => res.sendFile(join(__dirname, 'dist', 'index.html')));
+app.get('/demo/{*splat}', (_req, res) => res.sendFile(join(__dirname, 'dist', 'index.html')));
+
+// Catch-all: landing
+app.get('/{*splat}', sendLanding);
+
+// ─── Event listeners + GC ───
+setupEventListeners(config);
+startGarbageCollection(config);
+
+// ─── Start ───
 app.listen(PORT, () => {
-  console.log(`AI-Vet server running on port ${PORT}`);
-  console.log(`OpenAI key: ${OPENAI_API_KEY ? 'configured' : 'MISSING'}`);
-  console.log(`Telegram: ${TG_BOT_TOKEN ? 'configured' : 'not configured'}`);
+  logger.info({ port: PORT, env: process.env.NODE_ENV || 'development' }, 'AI-Vet SaaS server started');
+  logger.info({
+    supabase: !!process.env.SUPABASE_URL,
+    ai_routerai: !!process.env.AI__ROUTERAI_API_KEY,
+    telegram: !!process.env.TG_BOT_TOKEN,
+  }, 'Service status');
 });
