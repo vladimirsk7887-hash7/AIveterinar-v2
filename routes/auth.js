@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { supabaseAdmin } from '../db/supabase.js';
+import { supabaseAdmin, supabaseAnon } from '../db/supabase.js';
 import { authRateLimit } from '../middleware/rateLimit.js';
 import { eventBus } from '../services/events.js';
 import { createLogger } from '../services/logger.js';
@@ -99,7 +99,7 @@ router.post('/login', async (req, res) => {
   }
 
   try {
-    const { data, error } = await supabaseAdmin.auth.signInWithPassword({
+    const { data, error } = await supabaseAnon.auth.signInWithPassword({
       email,
       password,
     });

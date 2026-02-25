@@ -29,7 +29,7 @@ export async function authMiddleware(req, res, next) {
 
     // Check if user is superadmin (superadmin doesn't need a clinic)
     const superadminEmail = process.env.SUPERADMIN_EMAIL;
-    if (superadminEmail && user.email === superadminEmail) {
+    if (superadminEmail && user.email?.toLowerCase() === superadminEmail.toLowerCase()) {
       req.clinic = null; // Superadmin has no clinic
       return next();
     }
