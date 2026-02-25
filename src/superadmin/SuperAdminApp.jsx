@@ -17,9 +17,13 @@ export default function SuperAdminApp() {
   const [token, setToken] = useState(localStorage.getItem('sa_token'));
   const [page, setPage] = useState('clinics');
   const [selectedClinic, setSelectedClinic] = useState(null);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = (e) => {
     e.preventDefault();
+    setError('');
+    setLoading(true);
     const form = new FormData(e.target);
     const email = form.get('email');
     const password = form.get('password');
@@ -31,12 +35,21 @@ export default function SuperAdminApp() {
     })
       .then(r => r.json())
       .then(data => {
+        setLoading(false);
         if (data.access_token) {
           localStorage.setItem('sa_token', data.access_token);
           setToken(data.access_token);
+        } else if (data.error) {
+          setError(data.error);
+        } else {
+          setError('Неизвестная ошибка');
         }
       })
-      .catch(() => {});
+      .catch(err => {
+        setLoading(false);
+        setError('Ошибка соединения: ' + err.message);
+        console.error('Login error:', err);
+      });
   };
 
   if (!token) {
@@ -55,8 +68,14 @@ export default function SuperAdminApp() {
               <label className="label">Пароль</label>
               <input className="input" type="password" name="password" required />
             </div>
-            <button className="btn btn-primary" type="submit" style={{ width: '100%', marginTop: 16, justifyContent: 'center' }}>
-              Войти
+            {error && <div className="form-error">{error}</div>}
+            <button
+              className="btn btn-primary"
+              type="submit"
+              disabled={loading}
+              style={{ width: '100%', marginTop: 16, justifyContent: 'center', opacity: loading ? 0.6 : 1 }}
+            >
+              {loading ? 'Вход...' : 'Войти'}
             </button>
           </form>
         </div>
