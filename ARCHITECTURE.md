@@ -1,7 +1,7 @@
 # Архитектура: AI-Ветеринар SaaS Platform
 
 > Версия: 4.4 (Custom JWT, RPC + Upsert, GC, TG decrypt) | Дата: 2026-02-21
-> Домен: aiveterinar.ru
+> Домен: vetai24.ru
 
 ---
 
@@ -12,7 +12,7 @@
 | Критерий | Описание |
 |---|---|
 | **Форма** | Веб-платформа: лендинг + админ-панель + суперадмин + виджет-чат + TG Mini App |
-| **Домен** | aiveterinar.ru |
+| **Домен** | vetai24.ru |
 | **Функции** | Мультитенантный чат, 3 AI-провайдера, 3 платёжных провайдера, FSM, Event Bus, аналитика, event log |
 | **Готово когда** | Полный цикл: регистрация → настройка → виджет → заявки → оплата |
 
@@ -21,7 +21,7 @@
 ## Инфраструктура
 
 ```
-VPS #1 (aiveterinar.ru)
+VPS #1 (vetai24.ru)
   └─ Docker-контейнер: Express API + React (все frontends)
      └─ Деплоится через Coolify с VPS #2
 
@@ -422,7 +422,7 @@ POST /api/widget/:slug/chat
 
 ```
 Клиника создаёт бота через @BotFather → вводит токен в настройках
-  → Платформа вызывает: setWebhook(url: aiveterinar.ru/api/tg-webhook/{slug})
+  → Платформа вызывает: setWebhook(url: vetai24.ru/api/tg-webhook/{slug})
   → Telegram пушит обновления на: POST /api/tg-webhook/:slug
   → Express tenant middleware → обработка входящего сообщения
   → Никакого long polling. Один HTTP endpoint на все боты.
@@ -882,8 +882,8 @@ POST   /api/validate-tg                initData check
 
 platform:
   name: "AI-Ветеринар"
-  url: "https://aiveterinar.ru"
-  support_email: "support@aiveterinar.ru"
+  url: "https://vetai24.ru"
+  support_email: "support@vetai24.ru"
 
 # ─── AI ПРОВАЙДЕРЫ ───────────────────────────────────────
 ai:
@@ -1009,7 +1009,7 @@ payments:
   yookassa:
     enabled: false
     webhook_path: "/api/webhooks/yookassa"
-    return_url: "https://aiveterinar.ru/admin/billing"
+    return_url: "https://vetai24.ru/admin/billing"
 
   stripe:
     enabled: false
@@ -1098,7 +1098,7 @@ ENCRYPTION_KEY=32-byte-hex-for-tg-tokens
 LOG_LEVEL=info
 
 # Superadmin
-SUPERADMIN_EMAIL=admin@aiveterinar.ru
+SUPERADMIN_EMAIL=admin@vetai24.ru
 ```
 
 ---

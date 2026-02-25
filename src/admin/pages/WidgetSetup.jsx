@@ -56,7 +56,7 @@ export default function WidgetSetup() {
             whiteSpace: 'pre-wrap',
             wordBreak: 'break-all',
           }}>
-            {widgetCode || `<script src="https://aiveterinar.ru/widget.js" data-slug="${clinic?.slug || 'your-slug'}"></script>`}
+            {widgetCode || `<script src="https://vetai24.ru/widget.js" data-slug="${clinic?.slug || 'your-slug'}"></script>`}
           </pre>
           <button
             className="btn btn-primary"

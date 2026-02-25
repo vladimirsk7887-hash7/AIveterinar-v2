@@ -78,7 +78,7 @@ function ProfileTab({ clinic, setClinic, onSave, saving }) {
       <div className="form-group">
         <label className="label">Slug (URL)</label>
         <input className="input" value={clinic.slug || ''} onChange={update('slug')} pattern="[a-z0-9-]{3,50}" />
-        <div style={{ fontSize: 11, color: '#546E7A', marginTop: 4 }}>aiveterinar.ru/widget/<b>{clinic.slug}</b></div>
+        <div style={{ fontSize: 11, color: '#546E7A', marginTop: 4 }}>vetai24.ru/widget/<b>{clinic.slug}</b></div>
       </div>
       <div style={{ display: 'flex', gap: 12 }}>
         <div className="form-group" style={{ flex: 1 }}>

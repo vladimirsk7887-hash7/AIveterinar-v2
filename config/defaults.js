@@ -1,8 +1,8 @@
 export const configDefaults = {
   platform: {
     name: 'AI-Ветеринар',
-    url: 'https://aiveterinar.ru',
-    support_email: 'support@aiveterinar.ru',
+    url: 'https://vetai24.ru',
+    support_email: 'support@vetai24.ru',
   },
   ai: {
     default_provider: 'routerai',

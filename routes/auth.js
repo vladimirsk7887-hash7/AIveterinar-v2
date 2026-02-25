@@ -133,7 +133,7 @@ router.post('/reset-password', async (req, res) => {
 
   try {
     await supabaseAdmin.auth.resetPasswordForEmail(email, {
-      redirectTo: 'https://aiveterinar.ru/admin/reset-callback',
+      redirectTo: 'https://vetai24.ru/admin/reset-callback',
     });
     res.json({ message: 'Password reset email sent' });
   } catch (err) {

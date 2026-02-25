@@ -51,7 +51,7 @@ router.put('/branding', async (req, res) => {
 /** GET /api/clinic/widget-code */
 router.get('/widget-code', (req, res) => {
   const slug = req.clinic.slug;
-  const host = process.env.APP_URL || 'https://aiveterinar.ru';
+  const host = process.env.APP_URL || 'https://vetai24.ru';
   res.json({
     slug,
     code: `<!-- AI-Ветеринар Widget -->\n<script src="${host}/widget-loader.js" data-slug="${slug}"></script>`,

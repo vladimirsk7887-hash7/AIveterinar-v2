@@ -63,7 +63,7 @@ export default function Register({ onSwitch, onLogin }) {
               <div style={{ fontSize: 11, color: '#546E7A', marginTop: 6, display: 'flex', alignItems: 'center', gap: 4 }}>
                 <span>Адрес виджета:</span>
                 <span style={{ color: '#7C4DFF', fontFamily: "'JetBrains Mono', monospace" }}>
-                  aiveterinar.ru/widget/<b>{slug}</b>
+                  vetai24.ru/widget/<b>{slug}</b>
                 </span>
               </div>
             )}

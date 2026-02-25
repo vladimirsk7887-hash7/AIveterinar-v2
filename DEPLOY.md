@@ -3,7 +3,7 @@
 ## Требования
 - VPS #1: Ubuntu 22.04, 2+ ГБ RAM (приложение)
 - VPS #2: Supabase Self-Hosted (PostgreSQL 16 + Auth + Storage)
-- Домен: aiveterinar.ru → VPS #1
+- Домен: vetai24.ru → VPS #1
 
 ## 1. Supabase (VPS #2)
 
@@ -54,11 +54,11 @@ curl http://localhost:3000/api/health
 sudo apt install nginx certbot python3-certbot-nginx
 
 # Скопировать конфиг
-sudo cp nginx.conf /etc/nginx/sites-available/aiveterinar.ru
-sudo ln -s /etc/nginx/sites-available/aiveterinar.ru /etc/nginx/sites-enabled/
+sudo cp nginx.conf /etc/nginx/sites-available/vetai24.ru
+sudo ln -s /etc/nginx/sites-available/vetai24.ru /etc/nginx/sites-enabled/
 
 # SSL
-sudo certbot --nginx -d aiveterinar.ru -d www.aiveterinar.ru
+sudo certbot --nginx -d vetai24.ru -d www.vetai24.ru
 
 # Перезапуск
 sudo nginx -t && sudo systemctl reload nginx
@@ -88,7 +88,7 @@ docker compose up -d --build
 
 # Статус
 docker compose ps
-curl https://aiveterinar.ru/api/health
+curl https://vetai24.ru/api/health
 ```
 
 ## Coolify (альтернатива)
@@ -97,5 +97,5 @@ curl https://aiveterinar.ru/api/health
 1. Подключить Git-репозиторий
 2. Тип: Dockerfile
 3. Указать переменные окружения из `.env`
-4. Настроить домен: aiveterinar.ru
+4. Настроить домен: vetai24.ru
 5. Coolify автоматически настроит SSL и reverse proxy

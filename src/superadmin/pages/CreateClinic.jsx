@@ -65,8 +65,8 @@ export default function CreateClinic({ token, onBack }) {
 
   // Success screen
   if (result) {
-    const widgetUrl = `https://aiveterinar.ru/widget/${result.clinic.slug}`;
-    const adminUrl = 'https://aiveterinar.ru/admin';
+    const widgetUrl = `https://vetai24.ru/widget/${result.clinic.slug}`;
+    const adminUrl = 'https://vetai24.ru/admin';
     const credText = [
       `Клиника: ${result.clinic.name}`,
       `Email: ${result.credentials.email}`,

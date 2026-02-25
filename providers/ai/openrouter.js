@@ -14,7 +14,7 @@ export async function callOpenRouter({ messages, system, model, maxTokens, apiKe
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${apiKey}`,
-      'HTTP-Referer': 'https://aiveterinar.ru',
+      'HTTP-Referer': 'https://vetai24.ru',
       'X-Title': 'AI-Veterinar SaaS',
     },
     body: JSON.stringify({
