@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "Bash(npm install:*)",
+      "Bash(timeout:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx vite build:*)",
+      "Bash(ssh:*)",
+      "Bash(scp:*)",
+      "Bash(curl:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(openssl s_client:*)",
+      "Bash(where:*)"
+    ]
+  }
+}
