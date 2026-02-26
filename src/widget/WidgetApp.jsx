@@ -25,7 +25,7 @@ function useTheme() {
   });
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
-    try { localStorage.setItem("ai-vet-theme", theme); } catch {}
+    try { localStorage.setItem("ai-vet-theme", theme); } catch { }
   }, [theme]);
   const toggle = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
   return { theme, toggle };

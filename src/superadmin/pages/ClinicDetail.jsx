@@ -8,7 +8,7 @@ export default function ClinicDetail({ id, onBack, token }) {
   useEffect(() => {
     saApi.getClinic(token, id)
       .then(setClinic)
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoading(false));
   }, [id, token]);
 
@@ -16,7 +16,7 @@ export default function ClinicDetail({ id, onBack, token }) {
     try {
       await saApi.updateClinic(token, id, { is_active: !clinic.is_active });
       setClinic({ ...clinic, is_active: !clinic.is_active });
-    } catch {}
+    } catch { }
   };
 
   if (loading) return <div className="empty-state"><div className="icon">⏳</div>Загрузка...</div>;

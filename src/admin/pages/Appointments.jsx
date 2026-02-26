@@ -25,7 +25,7 @@ export default function Appointments() {
     setLoading(true);
     api.getAppointments(status || undefined)
       .then((data) => setAppointments(data.items || data || []))
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoading(false));
   };
 
@@ -35,7 +35,7 @@ export default function Appointments() {
     try {
       await api.updateAppointment(id, status);
       load(filter);
-    } catch {}
+    } catch { }
   };
 
   if (loading) return <div className="empty-state"><div className="icon">⏳</div>Загрузка...</div>;

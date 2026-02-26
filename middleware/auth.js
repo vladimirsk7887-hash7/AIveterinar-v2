@@ -28,7 +28,7 @@ export async function authMiddleware(req, res, next) {
     req.token = token;
 
     // Check if user is superadmin (superadmin doesn't need a clinic)
-    const superadminEmail = process.env.SUPERADMIN_EMAIL;
+    const superadminEmail = process.env.SUPERADMIN_EMAIL?.trim();
     logger.info({
       user_email: user.email,
       superadmin_email_set: !!superadminEmail,

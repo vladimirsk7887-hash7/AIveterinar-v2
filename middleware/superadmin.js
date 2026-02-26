@@ -3,7 +3,7 @@ import { createLogger } from '../services/logger.js';
 const logger = createLogger();
 
 export function superadminMiddleware(req, res, next) {
-  const superadminEmail = process.env.SUPERADMIN_EMAIL;
+  const superadminEmail = process.env.SUPERADMIN_EMAIL?.trim();
 
   if (!superadminEmail) {
     return res.status(503).json({ error: 'Superadmin not configured' });

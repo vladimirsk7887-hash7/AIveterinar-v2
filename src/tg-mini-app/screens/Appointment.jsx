@@ -28,7 +28,7 @@ export default function Appointment({ chatState, userName, onBack }) {
 
       const statusEmoji = chatState?.status === 'red' ? '🔴'
         : chatState?.status === 'yellow' ? '🟡'
-        : chatState?.status === 'green' ? '🟢' : '🔵';
+          : chatState?.status === 'green' ? '🟢' : '🔵';
 
       const card = chatState?.card || {};
       const cardText = [
@@ -149,7 +149,7 @@ export default function Appointment({ chatState, userName, onBack }) {
         <label className="tg-label">
           {contactType === 'telegram' ? 'Telegram username или номер'
             : contactType === 'whatsapp' ? 'Номер WhatsApp'
-            : 'Номер телефона'}
+              : 'Номер телефона'}
         </label>
         <input
           className="tg-input"
