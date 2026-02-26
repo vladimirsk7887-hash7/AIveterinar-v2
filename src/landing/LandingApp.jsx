@@ -1,7 +1,38 @@
 const PLANS = [
-  { name: 'Start', price: '1 990', conversations: '300', features: ['Виджет для сайта', 'Telegram-уведомления', 'Базовая аналитика', 'Кастомный промпт'] },
-  { name: 'Business', price: '4 990', conversations: '1 000', features: ['Всё из Start', 'Кастомный брендинг', 'Расширенная аналитика', 'Приоритетная поддержка'], popular: true },
-  { name: 'Pro', price: '9 990', conversations: '∞', features: ['Всё из Business', 'Свой Telegram-бот', 'API доступ', 'Персональный менеджер'] },
+  {
+    name: 'Start',
+    price: '1 990',
+    conversations: 'до 300 диалогов/мес (включен базовый пакет токенов)',
+    features: [
+      'Быстрая AI-модель (сбор контактов и запись)',
+      'Виджет для сайта',
+      'Telegram-уведомления',
+      'При исчерпании пакета — безопасная блокировка AI (переход в режим формы)'
+    ]
+  },
+  {
+    name: 'Business',
+    price: '4 990',
+    conversations: 'до 1 000 диалогов/мес (включен расширенный пакет токенов)',
+    features: [
+      'Продвинутая AI-модель (GPT-уровня) для сложных консультаций',
+      'Кастомный промпт и брендинг',
+      'Подключение до 3 виджетов и Telegram-каналов',
+      'Сверх лимита — прозрачная оплата с баланса клиники (3 ₽/1K токенов)'
+    ],
+    popular: true
+  },
+  {
+    name: 'Pro',
+    price: '9 990',
+    conversations: 'Максимальный пакет токенов (~2 000 диалогов)',
+    features: [
+      'Премиальные AI-модели (вкл. Claude 3.5 Sonnet)',
+      'Подключение собственного Telegram-бота клиники',
+      'Защита от перерасхода: аварийный лимит (Hard Cap)',
+      'Льготная стоимость дополнительных токенов (1.5 ₽/1K)'
+    ]
+  },
 ];
 
 const FEATURES = [
@@ -112,7 +143,7 @@ export default function LandingApp() {
       <section id="pricing" style={{ padding: '80px 20px', maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 60 }}>
           <h2 style={{ fontSize: 32, fontWeight: 800, marginBottom: 12 }}>Тарифы</h2>
-          <p style={{ color: '#546E7A', fontSize: 14 }}>Все расходы на AI включены в стоимость тарифа</p>
+          <p style={{ color: '#546E7A', fontSize: 14 }}>Единая подписка для клиник любого размера. Расходы на базовый AI уже включены в пакет.</p>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
           {PLANS.map((plan) => (
@@ -121,6 +152,8 @@ export default function LandingApp() {
               background: plan.popular ? 'linear-gradient(135deg, rgba(124,77,255,0.1), rgba(68,138,255,0.06))' : '#111629',
               border: `1px solid ${plan.popular ? 'rgba(124,77,255,0.3)' : 'rgba(255,255,255,0.06)'}`,
               position: 'relative',
+              display: 'flex',
+              flexDirection: 'column'
             }}>
               {plan.popular && (
                 <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', padding: '4px 16px', borderRadius: 12, background: 'linear-gradient(135deg, #7C4DFF, #448AFF)', fontSize: 11, fontWeight: 700 }}>
@@ -132,8 +165,8 @@ export default function LandingApp() {
                 <span style={{ fontSize: 36, fontWeight: 900, fontFamily: "'JetBrains Mono', monospace" }}>{plan.price}</span>
                 <span style={{ color: '#546E7A', fontSize: 14 }}> ₽/мес</span>
               </div>
-              <div style={{ fontSize: 12, color: '#90CAF9', marginBottom: 24 }}>до {plan.conversations} диалогов/мес</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 28 }}>
+              <div style={{ fontSize: 12, color: '#90CAF9', marginBottom: 24 }}>{plan.conversations}</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 28, flex: 1 }}>
                 {plan.features.map((f) => (
                   <div key={f} style={{ fontSize: 13, color: '#B0BEC5' }}>✓ {f}</div>
                 ))}
@@ -144,11 +177,15 @@ export default function LandingApp() {
                 border: plan.popular ? 'none' : '1px solid rgba(255,255,255,0.1)',
                 color: plan.popular ? '#fff' : '#B0BEC5',
                 fontWeight: 600, fontSize: 14,
+                marginTop: 'auto'
               }}>
                 Начать
               </a>
             </div>
           ))}
+        </div>
+        <div style={{ marginTop: 40, fontSize: 11, color: '#546E7A', lineHeight: 1.6, textAlign: 'left', maxWidth: 1100, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 20 }}>
+          * Один диалог рассчитывается как средняя сессия из 5 вопросов и ответов. Фактический учет ведется в токенах (слова и символы, обрабатываемые нейросетью). В тариф "Start" включено 2 млн токенов, "Business" — 10 млн токенов, "Pro" — 50 млн токенов. При исчерпании пакета на тарифах Business и Pro система автоматически переходит на оплату за сверхлимит с вашего авансового баланса. Платформа не предоставляет услуги в кредит.
         </div>
       </section>
 
