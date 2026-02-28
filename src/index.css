@@ -4,6 +4,8 @@
 /* THEME VARIABLES                        */
 /* ═══════════════════════════════════════ */
 :root {
+  --primary: #7C4DFF;
+  --primary-end: #536DFE;
   --bg-primary: #0B0E18;
   --bg-secondary: #0d1120;
   --bg-surface: rgba(255,255,255,0.018);

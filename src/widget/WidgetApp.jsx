@@ -56,6 +56,7 @@ export default function WidgetApp() {
         if (config.primaryColor) {
           root.style.setProperty('--w-primary', config.primaryColor);
           root.style.setProperty('--primary', config.primaryColor);
+          root.style.setProperty('--primary-end', config.primaryColor);
         }
         if (config.bgColor) {
           root.style.setProperty('--w-bg', config.bgColor);
@@ -144,7 +145,7 @@ export default function WidgetApp() {
             <>
               <div className="home-subtitle-top" style={{ fontSize: 12, fontWeight: 600, letterSpacing: 5, textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "clamp(6px, 1.5vh, 14px)", fontFamily: "'JetBrains Mono', monospace" }}>AI-ВЕТЕРИНАР</div>
               <h1 className="home-title" style={{ fontSize: "clamp(32px, 6vw, 56px)", fontWeight: 900, margin: 0, letterSpacing: -1, lineHeight: 1.1, position: "relative", display: "inline-block" }}>
-                <span style={{ background: "linear-gradient(135deg, #7C4DFF 0%, #536DFE 40%, #448AFF 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>AI-ВЕТЕРИНАР</span>
+                <span style={{ background: "linear-gradient(135deg, var(--primary, #7C4DFF), var(--primary-end, #536DFE))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>AI-ВЕТЕРИНАР</span>
                 <span style={{ position: "absolute", top: -6, right: -20, fontSize: 24, color: "#FFD740", WebkitTextFillColor: "#FFD740" }}>⁺</span>
               </h1>
             </>
@@ -214,7 +215,7 @@ export default function WidgetApp() {
       }}>
         <div style={{ padding: "18px 16px", borderBottom: "1px solid var(--border-subtle)", display: "flex", alignItems: "center", gap: 10 }}>
           <span style={{ fontSize: 22 }}>🐾</span>
-          <span style={{ fontWeight: 800, fontSize: 15, background: "linear-gradient(90deg, #7C4DFF, #448AFF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>AI-Ветеринар</span>
+          <span style={{ fontWeight: 800, fontSize: 15, background: "linear-gradient(90deg, var(--primary, #7C4DFF), var(--primary-end, #448AFF))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>AI-Ветеринар</span>
         </div>
         <div style={{ flex: 1, overflowY: "auto", padding: 10 }}>
           {pets.map((pet) => {
@@ -304,7 +305,7 @@ export default function WidgetApp() {
           <div style={{ borderBottom: "1px solid var(--border-subtle)" }}>
             <button onClick={() => setShowMobileCard(!showMobileCard)} style={{
               width: "100%", padding: "8px 14px", background: "var(--mobile-card-bg)",
-              border: "none", color: "#7C4DFF", fontSize: 11, fontWeight: 700,
+              border: "none", color: "var(--primary, #7C4DFF)", fontSize: 11, fontWeight: 700,
               letterSpacing: 1.5, textTransform: "uppercase", cursor: "pointer",
               fontFamily: "'JetBrains Mono', monospace", display: "flex", alignItems: "center", gap: 6,
             }}>
@@ -322,7 +323,7 @@ export default function WidgetApp() {
           {visibleMessages.map((msg, i) => <ChatMessage key={i} msg={msg} />)}
           {loading && (
             <div style={{ display: "flex", alignItems: "flex-start", marginBottom: 14 }}>
-              <div style={{ width: 34, height: 34, borderRadius: "50%", marginRight: 10, background: "linear-gradient(135deg, #7C4DFF, #536DFE)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, flexShrink: 0 }}>🐾</div>
+              <div style={{ width: 34, height: 34, borderRadius: "50%", marginRight: 10, background: "linear-gradient(135deg, var(--primary, #7C4DFF), var(--primary-end, #536DFE))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, flexShrink: 0 }}>🐾</div>
               <div style={{ padding: "14px 20px", borderRadius: "18px 18px 18px 4px", background: "var(--typing-bg)", border: "1px solid var(--typing-border)", color: "var(--text-muted)", fontSize: 18, letterSpacing: 3 }}>
                 <span className="typing-dots">•••</span>
               </div>
