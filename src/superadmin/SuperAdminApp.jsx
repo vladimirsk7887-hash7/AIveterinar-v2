@@ -5,10 +5,12 @@ import CreateClinic from './pages/CreateClinic.jsx';
 import Stats from './pages/Stats.jsx';
 import EventsLog from './pages/EventsLog.jsx';
 import Payments from './pages/Payments.jsx';
+import AiProviders from './pages/AiProviders.jsx';
 
 const PAGES = {
   clinics: { label: 'Клиники', icon: '🏥', component: ClinicsList },
   stats: { label: 'Статистика', icon: '📊', component: Stats },
+  ai: { label: 'AI Провайдеры', icon: '🤖', component: AiProviders },
   payments: { label: 'Платежи', icon: '💰', component: Payments },
   events: { label: 'События', icon: '📜', component: EventsLog },
 };

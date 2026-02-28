@@ -5,6 +5,7 @@ import { supabaseAdmin } from '../db/supabase.js';
 import { createLogger } from '../services/logger.js';
 import { transliterate, findUniqueSlug } from '../services/slug.js';
 import { eventBus } from '../services/events.js';
+import { loadConfig } from '../config/loader.js';
 
 const logger = createLogger();
 const router = Router();
@@ -226,6 +227,112 @@ router.get('/payments', async (req, res) => {
   } catch (err) {
     logger.error({ error: err.message }, 'Admin payments error');
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * GET /api/admin/ai-providers
+ * Returns status + masked keys for all configured AI providers.
+ */
+router.get('/ai-providers', async (_req, res) => {
+  const config = loadConfig();
+  const API_KEY_MAP = {
+    routerai: 'AI__ROUTERAI_API_KEY',
+    openrouter: 'AI__OPENROUTER_API_KEY',
+    openai: 'OPENAI_API_KEY',
+  };
+
+  const providers = Object.entries(config.ai.providers).map(([id, cfg]) => {
+    const envKey = API_KEY_MAP[id];
+    const keyValue = process.env[envKey] || '';
+    const hasKey = keyValue.length > 0;
+    const maskedKey = hasKey
+      ? `${keyValue.slice(0, 8)}...${keyValue.slice(-4)}`
+      : null;
+
+    return {
+      id,
+      enabled: cfg.enabled,
+      base_url: cfg.base_url,
+      env_var: envKey,
+      has_key: hasKey,
+      masked_key: maskedKey,
+      models: cfg.models || [],
+    };
+  });
+
+  res.json({
+    default_provider: config.ai.default_provider,
+    default_model: config.ai.default_model,
+    providers,
+  });
+});
+
+/**
+ * POST /api/admin/ai-providers/test
+ * Test a provider with a minimal chat call.
+ * Body: { provider_id, model_id }
+ */
+router.post('/ai-providers/test', async (req, res) => {
+  const { provider_id, model_id } = req.body;
+  if (!provider_id || !model_id) {
+    return res.status(400).json({ error: 'Missing provider_id or model_id' });
+  }
+
+  const API_KEY_MAP = {
+    routerai: 'AI__ROUTERAI_API_KEY',
+    openrouter: 'AI__OPENROUTER_API_KEY',
+    openai: 'OPENAI_API_KEY',
+  };
+  const BASE_URL_MAP = {
+    routerai: 'https://routerai.ru/api/v1',
+    openrouter: 'https://openrouter.ai/api/v1',
+    openai: 'https://api.openai.com/v1',
+  };
+
+  const apiKey = process.env[API_KEY_MAP[provider_id]];
+  if (!apiKey) {
+    return res.status(400).json({ ok: false, error: 'API key not set' });
+  }
+
+  const baseUrl = BASE_URL_MAP[provider_id];
+  const start = Date.now();
+
+  try {
+    const response = await fetch(`${baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: model_id,
+        max_tokens: 10,
+        messages: [{ role: 'user', content: 'Hi' }],
+      }),
+      signal: AbortSignal.timeout(15000),
+    });
+
+    const data = await response.json();
+    const latencyMs = Date.now() - start;
+
+    if (!response.ok) {
+      return res.json({
+        ok: false,
+        status: response.status,
+        error: data.error?.message || `HTTP ${response.status}`,
+        latencyMs,
+      });
+    }
+
+    res.json({
+      ok: true,
+      latencyMs,
+      model: data.model,
+      tokens: data.usage?.total_tokens || null,
+    });
+  } catch (err) {
+    res.json({ ok: false, error: err.message, latencyMs: Date.now() - start });
   }
 });
 

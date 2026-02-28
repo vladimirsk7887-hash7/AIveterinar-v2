@@ -23,4 +23,9 @@ export const saApi = {
   getStats: (token) => request('/admin/stats', token),
   getEvents: (token, limit = 100) => request(`/admin/events?limit=${limit}`, token),
   getPayments: (token) => request('/admin/payments', token),
+  getAiProviders: (token) => request('/admin/ai-providers', token),
+  testAiProvider: (token, provider_id, model_id) => request('/admin/ai-providers/test', token, {
+    method: 'POST',
+    body: JSON.stringify({ provider_id, model_id }),
+  }),
 };
