@@ -9,7 +9,7 @@ export function superadminMiddleware(req, res, next) {
     return res.status(503).json({ error: 'Superadmin not configured' });
   }
 
-  if (!req.user || req.user.email !== superadminEmail) {
+  if (!req.user || req.user.email?.toLowerCase() !== superadminEmail.toLowerCase()) {
     logger.warn({ email: req.user?.email }, 'Unauthorized superadmin access attempt');
     return res.status(403).json({ error: 'Access denied' });
   }
