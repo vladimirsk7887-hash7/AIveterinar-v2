@@ -6,6 +6,7 @@ import { createLogger } from '../services/logger.js';
 import { transliterate, findUniqueSlug } from '../services/slug.js';
 import { eventBus } from '../services/events.js';
 import { loadConfig } from '../config/loader.js';
+import { getSettings, getApiKey, setSetting, setApiKey } from '../services/platformSettings.js';
 
 const logger = createLogger();
 const router = Router();
@@ -242,30 +243,74 @@ router.get('/ai-providers', async (_req, res) => {
     openai: 'OPENAI_API_KEY',
   };
 
-  const providers = Object.entries(config.ai.providers).map(([id, cfg]) => {
-    const envKey = API_KEY_MAP[id];
-    const keyValue = process.env[envKey] || '';
-    const hasKey = keyValue.length > 0;
-    const maskedKey = hasKey
-      ? `${keyValue.slice(0, 8)}...${keyValue.slice(-4)}`
-      : null;
+  const settings = await getSettings();
+  const defaultProvider = settings['ai.default_provider'] || config.ai.default_provider;
+  const defaultModel    = settings['ai.default_model']    || config.ai.default_model;
 
-    return {
-      id,
-      enabled: cfg.enabled,
-      base_url: cfg.base_url,
-      env_var: envKey,
-      has_key: hasKey,
-      masked_key: maskedKey,
-      models: cfg.models || [],
-    };
-  });
+  const providers = await Promise.all(
+    Object.entries(config.ai.providers).map(async ([id, cfg]) => {
+      const envVar = API_KEY_MAP[id];
+      const dbKey  = await getApiKey(id);
+      const envKey = process.env[envVar] || '';
+      const activeKey = dbKey || envKey;
+      const hasKey = activeKey.length > 0;
+      const maskedKey = hasKey
+        ? `${activeKey.slice(0, 8)}...${activeKey.slice(-4)}`
+        : null;
+      const source = dbKey ? 'db' : (envKey ? 'env' : null);
+
+      return {
+        id,
+        enabled: cfg.enabled,
+        base_url: cfg.base_url,
+        env_var: envVar,
+        has_key: hasKey,
+        masked_key: maskedKey,
+        key_source: source,
+        models: cfg.models || [],
+      };
+    })
+  );
 
   res.json({
-    default_provider: config.ai.default_provider,
-    default_model: config.ai.default_model,
+    default_provider: defaultProvider,
+    default_model: defaultModel,
     providers,
   });
+});
+
+/**
+ * PUT /api/admin/ai-providers/settings
+ * Update default provider and/or default model.
+ * Body: { default_provider?, default_model? }
+ */
+router.put('/ai-providers/settings', async (req, res) => {
+  const { default_provider, default_model } = req.body;
+  if (!default_provider && !default_model) {
+    return res.status(400).json({ error: 'Provide default_provider and/or default_model' });
+  }
+  if (default_provider) await setSetting('ai.default_provider', default_provider);
+  if (default_model)    await setSetting('ai.default_model', default_model);
+  res.json({ ok: true });
+});
+
+/**
+ * PUT /api/admin/ai-providers/:providerId/key
+ * Store encrypted API key for a provider.
+ * Body: { api_key }
+ */
+router.put('/ai-providers/:providerId/key', async (req, res) => {
+  const { providerId } = req.params;
+  const { api_key } = req.body;
+  if (!api_key?.trim()) {
+    return res.status(400).json({ error: 'api_key is required' });
+  }
+  const config = loadConfig();
+  if (!config.ai.providers[providerId]) {
+    return res.status(400).json({ error: `Unknown provider: ${providerId}` });
+  }
+  await setApiKey(providerId, api_key.trim());
+  res.json({ ok: true });
 });
 
 /**

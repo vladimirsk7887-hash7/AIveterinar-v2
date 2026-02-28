@@ -4,14 +4,17 @@ import { saApi } from '../lib/api.js';
 export default function AiProviders({ token }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [testing, setTesting] = useState({}); // { 'routerai/model': { ok, latencyMs, error } }
+  const [testing, setTesting] = useState({});
 
-  useEffect(() => {
+  const load = () => {
+    setLoading(true);
     saApi.getAiProviders(token)
       .then(setData)
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [token]);
+  };
+
+  useEffect(() => { load(); }, [token]);
 
   const testProvider = async (providerId, modelId) => {
     const key = `${providerId}/${modelId}`;
@@ -31,37 +34,122 @@ export default function AiProviders({ token }) {
     <div>
       <div className="page-title">🤖 AI Провайдеры</div>
 
-      <div className="card" style={{ marginBottom: 16 }}>
-        <div style={{ display: 'flex', gap: 32 }}>
-          <div>
-            <div style={{ fontSize: 11, color: '#546E7A', textTransform: 'uppercase', letterSpacing: 1 }}>Провайдер по умолчанию</div>
-            <div style={{ marginTop: 4, fontWeight: 600 }}>{data.default_provider}</div>
-          </div>
-          <div>
-            <div style={{ fontSize: 11, color: '#546E7A', textTransform: 'uppercase', letterSpacing: 1 }}>Модель по умолчанию</div>
-            <div style={{ marginTop: 4, fontWeight: 600, fontFamily: 'monospace', fontSize: 12 }}>{data.default_model}</div>
-          </div>
-        </div>
-      </div>
+      <DefaultSettings token={token} data={data} onSaved={load} />
 
       {data.providers.map(provider => (
         <ProviderCard
           key={provider.id}
           provider={provider}
           testing={testing}
+          token={token}
           onTest={testProvider}
+          onKeySaved={load}
         />
       ))}
     </div>
   );
 }
 
-function ProviderCard({ provider, testing, onTest }) {
+function DefaultSettings({ token, data, onSaved }) {
+  const [provider, setProvider] = useState(data.default_provider);
+  const [model, setModel] = useState(data.default_model);
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState(null);
+
+  const currentModels = data.providers.find(p => p.id === provider)?.models || [];
+
+  const save = async () => {
+    setSaving(true);
+    setMsg(null);
+    try {
+      await saApi.updateAiSettings(token, { default_provider: provider, default_model: model });
+      setMsg({ ok: true, text: 'Сохранено' });
+      onSaved();
+    } catch (err) {
+      setMsg({ ok: false, text: err.message });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="card" style={{ marginBottom: 16 }}>
+      <div style={{ fontSize: 11, color: '#546E7A', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 }}>
+        Провайдер и модель по умолчанию
+      </div>
+      <div style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+        <div>
+          <div style={{ fontSize: 11, color: '#546E7A', marginBottom: 4 }}>Провайдер</div>
+          <select
+            value={provider}
+            onChange={e => { setProvider(e.target.value); setModel(''); }}
+            className="input"
+            style={{ minWidth: 160 }}
+          >
+            {data.providers.map(p => (
+              <option key={p.id} value={p.id}>{PROVIDER_NAME[p.id] || p.id}</option>
+            ))}
+          </select>
+        </div>
+        <div style={{ flex: 1, minWidth: 240 }}>
+          <div style={{ fontSize: 11, color: '#546E7A', marginBottom: 4 }}>Модель</div>
+          <select
+            value={model}
+            onChange={e => setModel(e.target.value)}
+            className="input"
+            style={{ width: '100%' }}
+          >
+            {currentModels.map(m => (
+              <option key={m.id} value={m.id}>{m.name} ({m.id})</option>
+            ))}
+          </select>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button
+            className="btn btn-primary"
+            onClick={save}
+            disabled={saving}
+            style={{ whiteSpace: 'nowrap', opacity: saving ? 0.6 : 1 }}
+          >
+            {saving ? 'Сохранение...' : 'Сохранить'}
+          </button>
+          {msg && (
+            <span style={{ fontSize: 12, color: msg.ok ? '#00E676' : '#FF5252' }}>{msg.text}</span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProviderCard({ provider, testing, token, onTest, onKeySaved }) {
+  const [keyInput, setKeyInput] = useState('');
+  const [savingKey, setSavingKey] = useState(false);
+  const [keyMsg, setKeyMsg] = useState(null);
+
   const statusDot = provider.enabled && provider.has_key
     ? { color: '#00E676', label: 'Активен' }
     : !provider.has_key
       ? { color: '#FF5252', label: 'Нет ключа' }
       : { color: '#546E7A', label: 'Отключён' };
+
+  const SOURCE_LABEL = { db: 'из БД', env: 'из env' };
+
+  const saveKey = async () => {
+    if (!keyInput.trim()) return;
+    setSavingKey(true);
+    setKeyMsg(null);
+    try {
+      await saApi.updateProviderKey(token, provider.id, keyInput.trim());
+      setKeyMsg({ ok: true, text: 'Ключ сохранён' });
+      setKeyInput('');
+      onKeySaved();
+    } catch (err) {
+      setKeyMsg({ ok: false, text: err.message });
+    } finally {
+      setSavingKey(false);
+    }
+  };
 
   return (
     <div className="card" style={{ marginBottom: 16 }}>
@@ -79,10 +167,40 @@ function ProviderCard({ provider, testing, onTest }) {
         </div>
       </div>
 
+      {/* API Key */}
       <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 11, color: '#546E7A', marginBottom: 6 }}>API KEY ({provider.env_var})</div>
-        <div style={{ fontFamily: 'monospace', fontSize: 12, background: 'rgba(255,255,255,0.04)', padding: '8px 12px', borderRadius: 8, color: provider.has_key ? '#B0BEC5' : '#FF5252' }}>
-          {provider.has_key ? provider.masked_key : '⚠ Не задан — добавьте переменную окружения в Coolify'}
+        <div style={{ fontSize: 11, color: '#546E7A', marginBottom: 6 }}>
+          API KEY ({provider.env_var})
+          {provider.key_source && (
+            <span style={{ marginLeft: 8, color: '#78909C' }}>
+              [{SOURCE_LABEL[provider.key_source] || provider.key_source}]
+            </span>
+          )}
+        </div>
+        <div style={{ fontFamily: 'monospace', fontSize: 12, background: 'rgba(255,255,255,0.04)', padding: '8px 12px', borderRadius: 8, color: provider.has_key ? '#B0BEC5' : '#FF5252', marginBottom: 8 }}>
+          {provider.has_key ? provider.masked_key : '⚠ Не задан — добавьте ключ ниже или переменную окружения в Coolify'}
+        </div>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <input
+            className="input"
+            type="password"
+            autoComplete="new-password"
+            placeholder="Новый ключ..."
+            value={keyInput}
+            onChange={e => setKeyInput(e.target.value)}
+            style={{ flex: 1, fontFamily: 'monospace', fontSize: 12 }}
+          />
+          <button
+            className="btn btn-outline"
+            onClick={saveKey}
+            disabled={savingKey || !keyInput.trim()}
+            style={{ whiteSpace: 'nowrap', opacity: savingKey ? 0.6 : 1 }}
+          >
+            {savingKey ? '...' : 'Обновить'}
+          </button>
+          {keyMsg && (
+            <span style={{ fontSize: 12, color: keyMsg.ok ? '#00E676' : '#FF5252' }}>{keyMsg.text}</span>
+          )}
         </div>
       </div>
 

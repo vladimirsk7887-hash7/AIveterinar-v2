@@ -28,4 +28,12 @@ export const saApi = {
     method: 'POST',
     body: JSON.stringify({ provider_id, model_id }),
   }),
+  updateAiSettings: (token, data) => request('/admin/ai-providers/settings', token, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  }),
+  updateProviderKey: (token, providerId, apiKey) => request(`/admin/ai-providers/${providerId}/key`, token, {
+    method: 'PUT',
+    body: JSON.stringify({ api_key: apiKey }),
+  }),
 };

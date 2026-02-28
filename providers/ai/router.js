@@ -3,6 +3,7 @@ import { createLogger } from '../../services/logger.js';
 import { callRouterAI } from './routerai.js';
 import { callOpenRouter } from './openrouter.js';
 import { callOpenAI } from './openai.js';
+import { getSettings, getApiKey } from '../../services/platformSettings.js';
 
 const logger = createLogger();
 
@@ -33,10 +34,15 @@ export async function callAI({ messages, system, providerId, modelId, maxTokens 
   const config = loadConfig();
   maxTokens = maxTokens || config.ai.max_completion_tokens;
 
+  // Read DB-stored defaults (fallback to config.yaml)
+  const settings = await getSettings().catch(() => ({}));
+  const effectiveProvider = providerId || settings['ai.default_provider'] || config.ai.default_provider;
+  const effectiveModel    = modelId    || settings['ai.default_model']    || config.ai.default_model;
+
   // Build ordered list of providers to try (preferred first, then failover)
-  const providerOrder = [providerId];
+  const providerOrder = [effectiveProvider];
   for (const pid of Object.keys(config.ai.providers)) {
-    if (pid !== providerId && config.ai.providers[pid].enabled) {
+    if (pid !== effectiveProvider && config.ai.providers[pid].enabled) {
       providerOrder.push(pid);
     }
   }
@@ -47,14 +53,14 @@ export async function callAI({ messages, system, providerId, modelId, maxTokens 
     const providerConfig = getAiProvider(pid);
     if (!providerConfig?.enabled) continue;
 
-    const apiKey = process.env[API_KEY_MAP[pid]];
+    const apiKey = (await getApiKey(pid).catch(() => null)) || process.env[API_KEY_MAP[pid]];
     if (!apiKey) {
       logger.debug({ provider: pid }, 'Skipping provider: no API key');
       continue;
     }
 
     // For failover, use the provider's default model if not the preferred provider
-    const currentModelId = pid === providerId ? modelId : providerConfig.models[0]?.id;
+    const currentModelId = pid === effectiveProvider ? effectiveModel : providerConfig.models[0]?.id;
     if (!currentModelId) continue;
 
     const callFn = PROVIDER_FN[pid];
