@@ -1,11 +1,25 @@
-name: Deploy to VPS via Coolify
+name: Test & Deploy
 
 on:
   push:
     branches: [main]
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci --include=dev
+      - name: Run unit & integration tests
+        run: npm test
+
   deploy:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Coolify Deploy
@@ -14,3 +28,9 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
             "http://188.225.87.99:8000/api/v1/deploy?uuid=w4cwwc4wckc4gkoko8cgsks0&force=true"
           echo "Deploy triggered!"
+
+      - name: Wait for deploy + run smoke tests
+        run: |
+          echo "Waiting 90s for container to come up..."
+          sleep 90
+          node tests/smoke/smoke.js https://vetai24.ru
