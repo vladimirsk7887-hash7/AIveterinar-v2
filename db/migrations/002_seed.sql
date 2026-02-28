@@ -17,8 +17,8 @@ INSERT INTO plans (id, name, price_monthly_rub, limits, features) VALUES
     "choose_provider": false
   }'::jsonb),
 
-  ('start', 'Старт', 299000, '{
-    "dialogs_per_month": 100,
+  ('start', 'Старт', 1990, '{
+    "dialogs_per_month": 300,
     "messages_per_dialog": 50,
     "tokens_included": 2000000,
     "overage": "block",
@@ -31,8 +31,8 @@ INSERT INTO plans (id, name, price_monthly_rub, limits, features) VALUES
     "choose_provider": false
   }'::jsonb),
 
-  ('business', 'Бизнес', 599000, '{
-    "dialogs_per_month": 500,
+  ('business', 'Бизнес', 4990, '{
+    "dialogs_per_month": 1000,
     "messages_per_dialog": 100,
     "tokens_included": 10000000,
     "overage": "charge",
@@ -47,7 +47,7 @@ INSERT INTO plans (id, name, price_monthly_rub, limits, features) VALUES
     "choose_provider": true
   }'::jsonb),
 
-  ('pro', 'Про', 999000, '{
+  ('pro', 'Про', 9990, '{
     "dialogs_per_month": 2000,
     "messages_per_dialog": 200,
     "tokens_included": 50000000,

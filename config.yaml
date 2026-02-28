@@ -79,9 +79,9 @@ tariffs:
 
   - id: "start"
     name: "Старт"
-    price_monthly_rub: 299000
+    price_monthly_rub: 1990
     limits:
-      dialogs_per_month: 100
+      dialogs_per_month: 300
       messages_per_dialog: 50
       tokens_included: 2000000
       overage: "block"
@@ -95,9 +95,9 @@ tariffs:
 
   - id: "business"
     name: "Бизнес"
-    price_monthly_rub: 599000
+    price_monthly_rub: 4990
     limits:
-      dialogs_per_month: 500
+      dialogs_per_month: 1000
       messages_per_dialog: 100
       tokens_included: 10000000
       overage: "charge"
@@ -113,7 +113,7 @@ tariffs:
 
   - id: "pro"
     name: "Про"
-    price_monthly_rub: 999000
+    price_monthly_rub: 9990
     limits:
       dialogs_per_month: 2000
       messages_per_dialog: 200
