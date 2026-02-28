@@ -22,6 +22,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Trigger Coolify Deploy
         run: |
           curl -s -X POST \
