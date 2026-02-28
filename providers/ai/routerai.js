@@ -20,7 +20,7 @@ export async function callRouterAI({ messages, system, model, maxTokens, apiKey,
         ...messages,
       ],
     }),
-    signal: AbortSignal.timeout(30000),
+    signal: AbortSignal.timeout(8000),
   });
 
   const data = await response.json();

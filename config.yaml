@@ -36,17 +36,21 @@ ai:
           output_cost_rub: 60
 
     openrouter:
-      enabled: false
+      enabled: true
       base_url: "https://openrouter.ai/api/v1"
       proxy: ""
       models:
+        - id: "deepseek/deepseek-chat-v3-0324"
+          name: "DeepSeek V3 (OpenRouter)"
+          input_cost_usd: 0.00014
+          output_cost_usd: 0.00028
         - id: "openai/gpt-4o"
           name: "GPT-4o (OpenRouter)"
           input_cost_usd: 0.0025
           output_cost_usd: 0.01
 
     openai:
-      enabled: true
+      enabled: false
       base_url: "https://api.openai.com/v1"
       models:
         - id: "gpt-4o"
