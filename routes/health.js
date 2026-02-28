@@ -15,7 +15,6 @@ router.get('/health', (_req, res) => {
       telegram: !!process.env.TG_BOT_TOKEN,
       yookassa: !!process.env.PAYMENTS__YOOKASSA__SHOP_ID,
       stripe: !!process.env.PAYMENTS__STRIPE__SECRET_KEY,
-      superadmin_email_set: !!process.env.SUPERADMIN_EMAIL,
     },
   });
 });

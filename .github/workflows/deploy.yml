@@ -12,5 +12,5 @@ jobs:
         run: |
           curl -s -X POST \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
-            "http://188.225.87.99:8000/api/v1/deploy?uuid=w4cwwc4wckc4gkoko8cgsks0&force=false"
+            "http://188.225.87.99:8000/api/v1/deploy?uuid=w4cwwc4wckc4gkoko8cgsks0&force=true"
           echo "Deploy triggered!"
