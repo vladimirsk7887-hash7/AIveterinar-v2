@@ -53,8 +53,16 @@ export default function WidgetApp() {
       if (config) {
         setClinicConfig(config);
         const root = document.documentElement;
-        if (config.primaryColor) root.style.setProperty('--w-primary', config.primaryColor);
-        if (config.bgColor) root.style.setProperty('--w-bg', config.bgColor);
+        if (config.primaryColor) {
+          root.style.setProperty('--w-primary', config.primaryColor);
+          root.style.setProperty('--primary', config.primaryColor);
+        }
+        if (config.bgColor) {
+          root.style.setProperty('--w-bg', config.bgColor);
+          root.style.setProperty('--bg-primary', config.bgColor);
+          root.style.setProperty('--bg-secondary', config.bgColor);
+          root.style.setProperty('--bg-topbar', config.bgColor);
+        }
       }
     });
   }, []);
