@@ -1,39 +1,22 @@
 import { Router } from 'express';
 import crypto from 'crypto';
+import { callAI } from '../providers/ai/router.js';
 
 const router = Router();
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
 const TG_BOT_TOKEN = process.env.TG_BOT_TOKEN || '';
 const TG_CHAT_ID = process.env.TG_CHAT_ID || '-5263363292';
 
-// OpenAI Chat Proxy (legacy, single-tenant)
+// Chat proxy — routes through configured AI provider (RouterAI by default)
 router.post('/chat', async (req, res) => {
-  if (!OPENAI_API_KEY) {
-    return res.status(500).json({ error: 'OPENAI_API_KEY not configured' });
-  }
   try {
     const { messages, system, max_tokens } = req.body;
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-5.2',
-        max_completion_tokens: max_tokens || 1000,
-        messages: [
-          { role: 'system', content: system || 'You are a helpful assistant.' },
-          ...messages,
-        ],
-      }),
+    const result = await callAI({
+      messages,
+      system: system || 'You are a helpful assistant.',
+      maxTokens: max_tokens || 1000,
     });
-    const data = await response.json();
-    if (!response.ok) {
-      return res.status(response.status).json({ error: data.error?.message || 'OpenAI error' });
-    }
-    res.json({ text: data.choices?.[0]?.message?.content || '' });
+    res.json({ text: result.text });
   } catch (err) {
     console.error('Chat error:', err.message, err.cause || '');
     res.status(500).json({ error: err.message || 'Server error' });
