@@ -32,6 +32,6 @@ jobs:
 
       - name: Wait for deploy + run smoke tests
         run: |
-          echo "Waiting 90s for container to come up..."
-          sleep 90
+          echo "Waiting 150s for container to come up..."
+          sleep 150
           node tests/smoke/smoke.js https://vetai24.ru
