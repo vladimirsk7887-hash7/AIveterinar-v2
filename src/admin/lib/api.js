@@ -27,6 +27,19 @@ export const api = {
   updateClinic: (data) => request('/clinic', { method: 'PUT', body: JSON.stringify(data) }),
   requestSetup: (data) => request('/clinic/setup-request', { method: 'POST', body: JSON.stringify(data) }),
   updateBranding: (data) => request('/clinic/branding', { method: 'PUT', body: JSON.stringify(data) }),
+  uploadLogo: async (file) => {
+    const token = localStorage.getItem('access_token');
+    const formData = new FormData();
+    formData.append('logo', file);
+    const res = await fetch(`${API_BASE}/clinic/logo`, {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: formData,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+    return data;
+  },
   getWidgetCode: () => request('/clinic/widget-code'),
 
   // Conversations

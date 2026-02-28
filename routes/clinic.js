@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import multer from 'multer';
 import { authMiddleware } from '../middleware/auth.js';
 import { supabaseAdmin } from '../db/supabase.js';
 import { getClinicAnalytics } from '../services/analytics.js';
@@ -7,6 +8,7 @@ import { createLogger } from '../services/logger.js';
 
 const logger = createLogger();
 const router = Router();
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 2 * 1024 * 1024 } });
 
 router.use(authMiddleware);
 
@@ -51,6 +53,27 @@ router.put('/branding', async (req, res) => {
     .select('settings').single();
   if (error) return res.status(400).json({ error: error.message });
   res.json({ branding: data.settings?.branding || {} });
+});
+
+/** POST /api/clinic/logo — upload logo image to Supabase Storage */
+router.post('/logo', upload.single('logo'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'Файл не выбран' });
+  const allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+  if (!allowed.includes(req.file.mimetype)) {
+    return res.status(400).json({ error: 'Допустимые форматы: JPG, PNG, GIF, WebP, SVG' });
+  }
+  const ext = req.file.mimetype === 'image/svg+xml' ? 'svg' : req.file.mimetype.split('/')[1];
+  const path = `${req.clinic.id}/logo.${ext}`;
+
+  await supabaseAdmin.storage.createBucket('logos', { public: true }).catch(() => {});
+
+  const { error } = await supabaseAdmin.storage
+    .from('logos')
+    .upload(path, req.file.buffer, { contentType: req.file.mimetype, upsert: true });
+  if (error) return res.status(400).json({ error: error.message });
+
+  const { data: { publicUrl } } = supabaseAdmin.storage.from('logos').getPublicUrl(path);
+  res.json({ url: publicUrl });
 });
 
 /** GET /api/clinic/widget-code */

@@ -102,11 +102,29 @@ function ProfileTab({ clinic, setClinic, onSave, saving }) {
 }
 
 function BrandingTab({ clinic, setClinic, onSave, saving }) {
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
   const branding = clinic.settings?.branding || {};
   const updateBranding = (field) => (e) => setClinic({
     ...clinic,
     settings: { ...(clinic.settings || {}), branding: { ...branding, [field]: e.target.value } },
   });
+
+  const handleLogoFile = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setUploadError('');
+    try {
+      const { url } = await api.uploadLogo(file);
+      setClinic({ ...clinic, settings: { ...(clinic.settings || {}), branding: { ...branding, logo_url: url } } });
+    } catch (err) {
+      setUploadError(err.message);
+    } finally {
+      setUploading(false);
+      e.target.value = '';
+    }
+  };
 
   return (
     <div className="card">
@@ -137,7 +155,17 @@ function BrandingTab({ clinic, setClinic, onSave, saving }) {
       </div>
       <div className="form-group">
         <label className="label">URL логотипа</label>
-        <input className="input" value={branding.logo_url || ''} onChange={updateBranding('logo_url')} placeholder="https://..." />
+        <div style={{ display: 'flex', gap: 8 }}>
+          <input className="input" value={branding.logo_url || ''} onChange={updateBranding('logo_url')} placeholder="https://..." style={{ flex: 1 }} />
+          <label className="btn btn-outline" style={{ whiteSpace: 'nowrap', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+            {uploading ? 'Загрузка...' : 'Загрузить файл'}
+            <input type="file" accept="image/*" onChange={handleLogoFile} disabled={uploading} style={{ display: 'none' }} />
+          </label>
+        </div>
+        {uploadError && <div style={{ fontSize: 12, color: '#FF5252', marginTop: 4 }}>{uploadError}</div>}
+        {branding.logo_url && (
+          <img src={branding.logo_url} alt="Логотип" style={{ marginTop: 8, maxHeight: 48, maxWidth: 200, objectFit: 'contain', borderRadius: 8, background: 'rgba(255,255,255,0.05)', padding: 4 }} />
+        )}
       </div>
       <button className="btn btn-primary" onClick={() => onSave(clinic.settings?.branding || {}, 'branding')} disabled={saving}>
         {saving ? 'Сохранение...' : 'Сохранить брендинг'}
