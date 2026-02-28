@@ -102,8 +102,11 @@ function ProfileTab({ clinic, setClinic, onSave, saving }) {
 }
 
 function BrandingTab({ clinic, setClinic, onSave, saving }) {
-  const branding = clinic.branding || {};
-  const updateBranding = (field) => (e) => setClinic({ ...clinic, branding: { ...branding, [field]: e.target.value } });
+  const branding = clinic.settings?.branding || {};
+  const updateBranding = (field) => (e) => setClinic({
+    ...clinic,
+    settings: { ...(clinic.settings || {}), branding: { ...branding, [field]: e.target.value } },
+  });
 
   return (
     <div className="card">
@@ -136,7 +139,7 @@ function BrandingTab({ clinic, setClinic, onSave, saving }) {
         <label className="label">URL логотипа</label>
         <input className="input" value={branding.logo_url || ''} onChange={updateBranding('logo_url')} placeholder="https://..." />
       </div>
-      <button className="btn btn-primary" onClick={() => onSave(clinic.branding || {}, 'branding')} disabled={saving}>
+      <button className="btn btn-primary" onClick={() => onSave(clinic.settings?.branding || {}, 'branding')} disabled={saving}>
         {saving ? 'Сохранение...' : 'Сохранить брендинг'}
       </button>
     </div>

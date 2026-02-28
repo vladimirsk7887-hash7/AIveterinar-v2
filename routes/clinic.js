@@ -34,18 +34,23 @@ router.put('/', async (req, res) => {
 
 /** PUT /api/clinic/branding */
 router.put('/branding', async (req, res) => {
-  const { primary_color, secondary_color, logo_url, welcome_message } = req.body;
-  const updates = { updated_at: new Date().toISOString() };
-  if (primary_color) updates.primary_color = primary_color;
-  if (secondary_color) updates.secondary_color = secondary_color;
-  if (logo_url !== undefined) updates.logo_url = logo_url;
-  if (welcome_message !== undefined) updates.welcome_message = welcome_message;
+  const { primary_color, bg_color, logo_url, welcome_message, system_prompt } = req.body;
+  const brandingUpdate = {};
+  if (primary_color !== undefined) brandingUpdate.primary_color = primary_color;
+  if (bg_color !== undefined) brandingUpdate.bg_color = bg_color;
+  if (logo_url !== undefined) brandingUpdate.logo_url = logo_url;
+  if (welcome_message !== undefined) brandingUpdate.welcome_message = welcome_message;
+  if (system_prompt !== undefined) brandingUpdate.system_prompt = system_prompt;
+
+  const currentSettings = req.clinic.settings || {};
+  const newSettings = { ...currentSettings, branding: { ...(currentSettings.branding || {}), ...brandingUpdate } };
 
   const { data, error } = await supabaseAdmin
-    .from('clinics').update(updates).eq('id', req.clinic.id)
-    .select('primary_color, secondary_color, logo_url, welcome_message').single();
+    .from('clinics').update({ settings: newSettings, updated_at: new Date().toISOString() })
+    .eq('id', req.clinic.id)
+    .select('settings').single();
   if (error) return res.status(400).json({ error: error.message });
-  res.json(data);
+  res.json({ branding: data.settings?.branding || {} });
 });
 
 /** GET /api/clinic/widget-code */
