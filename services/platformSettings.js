@@ -9,7 +9,10 @@ async function loadAll() {
   const { data, error } = await supabaseAdmin
     .from('platform_settings')
     .select('key,value');
-  if (error) throw error;
+  if (error) {
+    // Table may not exist yet — return empty, fall back to config.yaml / env
+    return {};
+  }
   return Object.fromEntries((data || []).map(r => [r.key, r.value]));
 }
 
