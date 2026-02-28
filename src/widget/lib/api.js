@@ -28,12 +28,13 @@ export function getConversationId(petId) {
  * Check if widget is properly configured (clinic exists and is active).
  */
 export async function checkServerKey() {
-  if (!slug) return false;
+  if (!slug) return null;
   try {
     const res = await fetch(`${API}/config`);
-    return res.ok;
+    if (!res.ok) return null;
+    return await res.json();
   } catch {
-    return false;
+    return null;
   }
 }
 

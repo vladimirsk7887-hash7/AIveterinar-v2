@@ -43,11 +43,20 @@ export default function WidgetApp() {
   const [showAppointment, setShowAppointment] = useState(false);
   const [showMobileCard, setShowMobileCard] = useState(false);
   const [serverReady, setServerReady] = useState(true);
+  const [clinicConfig, setClinicConfig] = useState(null);
   const chatEndRef = useRef(null);
   const activePet = pets.find((p) => p.id === activePetId);
 
   useEffect(() => {
-    checkServerKey().then(setServerReady);
+    checkServerKey().then((config) => {
+      setServerReady(!!config);
+      if (config) {
+        setClinicConfig(config);
+        const root = document.documentElement;
+        if (config.primaryColor) root.style.setProperty('--w-primary', config.primaryColor);
+        if (config.bgColor) root.style.setProperty('--w-bg', config.bgColor);
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -121,12 +130,22 @@ export default function WidgetApp() {
         </button>
 
         <div style={{ textAlign: "center", marginBottom: "clamp(16px, 4vh, 48px)" }}>
-          <div className="home-subtitle-top" style={{ fontSize: 12, fontWeight: 600, letterSpacing: 5, textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "clamp(6px, 1.5vh, 14px)", fontFamily: "'JetBrains Mono', monospace" }}>AI-ВЕТЕРИНАР</div>
-          <h1 className="home-title" style={{ fontSize: "clamp(32px, 6vw, 56px)", fontWeight: 900, margin: 0, letterSpacing: -1, lineHeight: 1.1, position: "relative", display: "inline-block" }}>
-            <span style={{ background: "linear-gradient(135deg, #7C4DFF 0%, #536DFE 40%, #448AFF 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>AI-ВЕТЕРИНАР</span>
-            <span style={{ position: "absolute", top: -6, right: -20, fontSize: 24, color: "#FFD740", WebkitTextFillColor: "#FFD740" }}>⁺</span>
-          </h1>
-          <div className="home-subtitle-bottom" style={{ fontSize: 11, letterSpacing: 6, textTransform: "uppercase", color: "var(--text-muted)", marginTop: "clamp(8px, 1.5vh, 18px)", fontFamily: "'JetBrains Mono', monospace" }}>Профессиональная поддержка 24/7</div>
+          {clinicConfig?.logoUrl ? (
+            <img src={clinicConfig.logoUrl} alt={clinicConfig.name} style={{ maxHeight: 64, maxWidth: 200, objectFit: "contain", marginBottom: "clamp(8px, 2vh, 20px)" }} />
+          ) : (
+            <>
+              <div className="home-subtitle-top" style={{ fontSize: 12, fontWeight: 600, letterSpacing: 5, textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "clamp(6px, 1.5vh, 14px)", fontFamily: "'JetBrains Mono', monospace" }}>AI-ВЕТЕРИНАР</div>
+              <h1 className="home-title" style={{ fontSize: "clamp(32px, 6vw, 56px)", fontWeight: 900, margin: 0, letterSpacing: -1, lineHeight: 1.1, position: "relative", display: "inline-block" }}>
+                <span style={{ background: "linear-gradient(135deg, #7C4DFF 0%, #536DFE 40%, #448AFF 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>AI-ВЕТЕРИНАР</span>
+                <span style={{ position: "absolute", top: -6, right: -20, fontSize: 24, color: "#FFD740", WebkitTextFillColor: "#FFD740" }}>⁺</span>
+              </h1>
+            </>
+          )}
+          {clinicConfig?.welcomeMessage ? (
+            <div style={{ fontSize: 14, color: "var(--text-muted)", marginTop: "clamp(8px, 1.5vh, 18px)", maxWidth: 420, margin: "clamp(8px, 1.5vh, 18px) auto 0" }}>{clinicConfig.welcomeMessage}</div>
+          ) : (
+            <div className="home-subtitle-bottom" style={{ fontSize: 11, letterSpacing: 6, textTransform: "uppercase", color: "var(--text-muted)", marginTop: "clamp(8px, 1.5vh, 18px)", fontFamily: "'JetBrains Mono', monospace" }}>Профессиональная поддержка 24/7</div>
+          )}
         </div>
 
         {!serverReady && (

@@ -18,11 +18,14 @@ router.use('/:slug', tenantMiddleware);
  */
 router.get('/:slug/config', (req, res) => {
   const clinic = req.clinic;
+  const branding = clinic.settings?.branding || {};
   res.json({
-    name: clinic.settings?.display_name || '',
-    primaryColor: clinic.primary_color,
-    secondaryColor: clinic.secondary_color,
-    welcomeMessage: clinic.welcome_message || 'Здравствуйте! Опишите, что беспокоит вашего питомца.',
+    name: clinic.name || '',
+    primaryColor: branding.primary_color || null,
+    bgColor: branding.bg_color || null,
+    welcomeMessage: branding.welcome_message || null,
+    logoUrl: branding.logo_url || null,
+    systemPrompt: branding.system_prompt || null,
   });
 });
 
