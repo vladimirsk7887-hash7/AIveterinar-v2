@@ -14,6 +14,7 @@ export default defineConfig({
         superadmin: resolve(__dirname, 'superadmin.html'),
         widget: resolve(__dirname, 'widget.html'),
         tg: resolve(__dirname, 'tg-mini-app.html'),
+        max: resolve(__dirname, 'max-mini-app.html'),
       },
     },
   },

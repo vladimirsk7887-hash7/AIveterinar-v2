@@ -16,6 +16,7 @@ dist-ssr
 
 # AI agent files (Cursor, Codex, etc.)
 .agent/
+skills/
 .coolify-key
 .env.coolify
 deploy-vps3.ps1

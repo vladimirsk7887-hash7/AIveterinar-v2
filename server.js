@@ -77,6 +77,7 @@ const sendAdmin = (_req, res) => res.sendFile(join(__dirname, 'dist', 'admin.htm
 const sendSuper = (_req, res) => res.sendFile(join(__dirname, 'dist', 'superadmin.html'));
 const sendWidget = (_req, res) => res.sendFile(join(__dirname, 'dist', 'widget.html'));
 const sendTg = (_req, res) => res.sendFile(join(__dirname, 'dist', 'tg-mini-app.html'));
+const sendMax = (_req, res) => res.sendFile(join(__dirname, 'dist', 'max-mini-app.html'));
 const sendLanding = (_req, res) => res.sendFile(join(__dirname, 'dist', 'landing.html'));
 
 app.get('/admin', sendAdmin);
@@ -90,6 +91,9 @@ app.get('/widget/:slug/{*splat}', sendWidget);
 
 app.get('/tg', sendTg);
 app.get('/tg/{*splat}', sendTg);
+
+app.get('/max', sendMax);
+app.get('/max/{*splat}', sendMax);
 
 app.get('/landing', sendLanding);
 
@@ -108,11 +112,16 @@ setupEventListeners(config);
 startGarbageCollection(config);
 
 // ─── Start ───
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   logger.info({ port: PORT, env: process.env.NODE_ENV || 'development' }, 'AI-Vet SaaS server started');
   logger.info({
     supabase: !!process.env.SUPABASE_URL,
     ai_routerai: !!process.env.AI__ROUTERAI_API_KEY,
     telegram: !!process.env.TG_BOT_TOKEN,
   }, 'Service status');
+});
+
+process.on('SIGTERM', () => {
+  logger.info('SIGTERM received, shutting down gracefully');
+  server.close(() => process.exit(0));
 });
