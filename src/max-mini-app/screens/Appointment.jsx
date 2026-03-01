@@ -7,7 +7,7 @@ export default function Appointment({ chatState, userName, onBack }) {
   const { hapticNotification, close } = useMax();
   const [step, setStep] = useState('form'); // form | sending | success | error
   const [name, setName] = useState(userName || '');
-  const [contactType, setContactType] = useState('telegram');
+  const [contactType, setContactType] = useState('max');
   const [contact, setContact] = useState('');
 
   const handleSubmit = useCallback(async () => {
@@ -37,8 +37,8 @@ export default function Appointment({ chatState, userName, onBack }) {
         card.symptoms?.length && `Симптомы: ${card.symptoms.join(', ')}`,
       ].filter(Boolean).join('\n');
 
-      const contactLabel = contactType === 'telegram' ? 'Telegram'
-        : contactType === 'whatsapp' ? 'WhatsApp' : 'Телефон';
+      const contactLabel = contactType === 'max' ? 'Max'
+        : contactType === 'telegram' ? 'Telegram' : 'Телефон';
 
       const message = [
         `${statusEmoji} <b>НОВАЯ ЗАПИСЬ НА ПРИЁМ</b>`,
@@ -127,8 +127,8 @@ export default function Appointment({ chatState, userName, onBack }) {
         <label className="tg-label">Способ связи</label>
         <div className="tg-contact-types">
           {[
-            { key: 'telegram', label: 'Telegram', icon: '💬' },
-            { key: 'whatsapp', label: 'WhatsApp', icon: '📱' },
+            { key: 'max', label: 'Max', icon: '💬' },
+            { key: 'telegram', label: 'Telegram', icon: '✈️' },
             { key: 'phone', label: 'Телефон', icon: '📞' },
           ].map((ct) => (
             <button
@@ -142,15 +142,15 @@ export default function Appointment({ chatState, userName, onBack }) {
         </div>
 
         <label className="tg-label">
-          {contactType === 'telegram' ? 'Telegram username или номер'
-            : contactType === 'whatsapp' ? 'Номер WhatsApp'
+          {contactType === 'max' ? 'Имя пользователя Max'
+            : contactType === 'telegram' ? 'Telegram username или номер'
               : 'Номер телефона'}
         </label>
         <input
           className="tg-input"
           value={contact}
           onChange={(e) => setContact(e.target.value)}
-          placeholder={contactType === 'telegram' ? '@username' : '+7 ...'}
+          placeholder={contactType === 'max' ? '@username' : contactType === 'telegram' ? '@username' : '+7 ...'}
         />
 
         <button
