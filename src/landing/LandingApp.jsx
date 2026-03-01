@@ -1,4 +1,4 @@
-﻿const PLANS = [
+const PLANS = [
   {
     name: 'Start',
     price: '1 990',
@@ -54,13 +54,18 @@ export default function LandingApp() {
         button { cursor: pointer; transition: all 0.2s ease; }
         .card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
         .card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -10px rgba(59, 130, 246, 0.15); }
+        .pricing-btn:hover { background: #E2E8F0 !important; }
+        .pricing-btn-popular:hover { background: #2563EB !important; }
+        .landing-pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
         @media (max-width: 640px) {
-          .landing-nav { padding: 16px 20px !important; }
-          .landing-nav-links { display: none !important; }
-          .landing-nav-mobile-btn { display: inline-block !important; }
+          .landing-nav { padding: 16px 20px !important; flex-wrap: wrap; gap: 12px; }
+          .landing-nav-links { gap: 16px !important; width: 100%; justify-content: space-between; }
           .landing-hero { padding: 48px 20px 40px !important; }
           .landing-hero-desc { font-size: 17px !important; }
+          .landing-hero-btns { flex-direction: column !important; align-items: stretch !important; }
+          .landing-hero-btns a { text-align: center; }
           .landing-grid { grid-template-columns: 1fr !important; }
+          .landing-pricing-grid { grid-template-columns: 1fr !important; }
           .landing-cta-box { padding: 40px 24px !important; }
           .landing-cta-title { font-size: 26px !important; }
           .landing-hero-trust { flex-direction: column; gap: 6px !important; align-items: center; }
@@ -81,9 +86,6 @@ export default function LandingApp() {
             Войти
           </a>
         </div>
-        <a className="landing-nav-mobile-btn" href="/admin" style={{ padding: '10px 20px', borderRadius: 8, background: '#3B82F6', color: '#fff', fontWeight: 600, fontSize: 14, display: 'none' }}>
-          Войти
-        </a>
       </nav>
 
       {/* Hero */}
@@ -100,7 +102,7 @@ export default function LandingApp() {
         <p className="landing-hero-desc" style={{ fontSize: 20, color: '#475569', lineHeight: 1.6, maxWidth: 640, margin: '0 auto 40px', fontWeight: 400 }}>
           Автоматический триаж обращений, сбор анамнеза, запись на приём — круглосуточно и без участия администратора.
         </p>
-        <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
+        <div className="landing-hero-btns" style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
           <a href="/admin" style={{ padding: '16px 36px', borderRadius: 10, background: '#F97316', color: '#fff', fontWeight: 700, fontSize: 16, boxShadow: '0 8px 20px -6px rgba(249, 115, 22, 0.4)' }}>
             Попробовать бесплатно
           </a>
@@ -179,7 +181,7 @@ export default function LandingApp() {
             Единая подписка для клиник любого размера. Расходы на базовый AI уже включены в пакет.
           </p>
         </div>
-        <div className="landing-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
+        <div className="landing-pricing-grid">
           {PLANS.map((plan) => (
              <div key={plan.name} className="card" style={{
               padding: 40, borderRadius: 20,
@@ -204,34 +206,28 @@ export default function LandingApp() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 40, flex: 1 }}>
                 {plan.features.map((f) => (
                   <div key={f} style={{ fontSize: 15, color: '#475569', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                    <span style={{ color: '#10B981', fontWeight: 'bold' }}>✓</span> 
+                    <span style={{ color: '#10B981', fontWeight: 'bold' }}>✓</span>
                     <span style={{ lineHeight: 1.5 }}>{f}</span>
                   </div>
                 ))}
               </div>
-              <a href="/admin" style={{
-                display: 'block', textAlign: 'center', padding: '14px 24px', borderRadius: 10,
-                background: plan.popular ? '#3B82F6' : '#F1F5F9',
-                color: plan.popular ? '#fff' : '#0F172A',
-                fontWeight: 600, fontSize: 15,
-                marginTop: 'auto',
-                transition: 'all 0.2s',
-              }}
-              onMouseEnter={(e) => {
-                if(!plan.popular) e.currentTarget.style.background = '#E2E8F0';
-                else e.currentTarget.style.background = '#2563EB';
-              }}
-              onMouseLeave={(e) => {
-                if(!plan.popular) e.currentTarget.style.background = '#F1F5F9';
-                else e.currentTarget.style.background = '#3B82F6';
-              }}
+              <a href="/admin"
+                className={plan.popular ? 'pricing-btn-popular' : 'pricing-btn'}
+                style={{
+                  display: 'block', textAlign: 'center', padding: '14px 24px', borderRadius: 10,
+                  background: plan.popular ? '#3B82F6' : '#F1F5F9',
+                  color: plan.popular ? '#fff' : '#0F172A',
+                  fontWeight: 600, fontSize: 15,
+                  marginTop: 'auto',
+                  transition: 'background 0.2s',
+                }}
               >
                 Начать работу
               </a>
             </div>
           ))}
         </div>
-        <div style={{ marginTop: 48, fontSize: 12, color: '#64748B', lineHeight: 1.6, textAlign: 'left', maxWidth: 1100, borderTop: '1px solid #E2E8F0', paddingTop: 24 }}>
+        <div style={{ marginTop: 48, fontSize: 13, color: '#94A3B8', lineHeight: 1.6, textAlign: 'left', maxWidth: 1100, borderTop: '1px solid #E2E8F0', paddingTop: 24 }}>
           * Один диалог рассчитывается как средняя сессия из 5 вопросов и ответов. Фактический учет ведется в токенах (слова и символы, обрабатываемые нейросетью). В тариф "Start" включено 2 млн токенов, "Business" — 10 млн токенов, "Pro" — 50 млн токенов. При исчерпании пакета на тарифах Business и Pro система автоматически переходит на оплату за сверхлимит с вашего авансового баланса. Платформа не предоставляет услуги в кредит.
         </div>
       </section>
@@ -251,9 +247,16 @@ export default function LandingApp() {
       </section>
 
       {/* Footer */}
-      <footer style={{ padding: '40px 20px', borderTop: '1px solid #E2E8F0', textAlign: 'center', background: '#ffffff' }}>
-        <div style={{ color: '#64748B', fontSize: 14, fontWeight: 500 }}>
-          © {new Date().getFullYear()} AI-Ветеринар · Умная платформа для ветклиник
+      <footer style={{ padding: '40px 20px', borderTop: '1px solid #E2E8F0', background: '#ffffff' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
+          <div style={{ color: '#64748B', fontSize: 14, fontWeight: 500 }}>
+            © {new Date().getFullYear()} AI-Ветеринар · Умная платформа для ветклиник
+          </div>
+          <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
+            <a href="#features" style={{ fontSize: 14, color: '#64748B', fontWeight: 500 }}>Возможности</a>
+            <a href="#pricing" style={{ fontSize: 14, color: '#64748B', fontWeight: 500 }}>Тарифы</a>
+            <a href="/admin" style={{ fontSize: 14, color: '#3B82F6', fontWeight: 600 }}>Войти</a>
+          </div>
         </div>
       </footer>
     </div>
