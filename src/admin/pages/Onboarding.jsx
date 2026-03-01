@@ -120,8 +120,8 @@ export default function Onboarding({ clinic, onComplete }) {
             onMouseEnter={(e) => e.currentTarget.style.borderColor = 'rgba(124,77,255,0.5)'}
             onMouseLeave={(e) => e.currentTarget.style.borderColor = 'rgba(124,77,255,0.2)'}
           >
-            <div style={{ fontSize: 36, marginBottom: 12 }}>&#9997;&#65039;</div>
-            <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>Настрою сам</div>
+            <div style={{ fontSize: 36, marginBottom: 12 }}>{loading ? '⏳' : '✍️'}</div>
+            <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>{loading ? 'Переход...' : 'Настрою сам'}</div>
             <div style={{ fontSize: 12, color: '#B0BEC5', lineHeight: 1.5 }}>
               Telegram, виджет, промпт — всё в настройках кабинета
             </div>

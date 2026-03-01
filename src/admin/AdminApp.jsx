@@ -29,6 +29,7 @@ export default function AdminApp() {
   const [selectedId, setSelectedId] = useState(null);
   const [clinic, setClinic] = useState(null);
   const [clinicLoading, setClinicLoading] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogin = (accessToken) => {
     localStorage.setItem('access_token', accessToken);
@@ -47,7 +48,12 @@ export default function AdminApp() {
     setClinicLoading(true);
     api.getClinic()
       .then(setClinic)
-      .catch(() => {})
+      .catch((err) => {
+        // Expired or invalid token — redirect to login
+        if (err.message?.includes('401') || err.message?.toLowerCase().includes('unauthorized')) {
+          handleLogout();
+        }
+      })
       .finally(() => setClinicLoading(false));
   }, [token]);
 
@@ -58,9 +64,18 @@ export default function AdminApp() {
     return <Login onSwitch={() => setAuthPage('register')} onLogin={handleLogin} />;
   }
 
-  // Show loading while checking clinic
+  // Show loading while checking clinic (with proper card wrapper)
   if (clinicLoading) {
-    return <div className="auth-page"><div className="empty-state"><div className="icon">&#9203;</div>Загрузка...</div></div>;
+    return (
+      <div className="auth-page">
+        <div className="auth-card" style={{ textAlign: 'center' }}>
+          <div className="empty-state">
+            <div className="icon">⏳</div>
+            Загрузка...
+          </div>
+        </div>
+      </div>
+    );
   }
 
   // Show onboarding for new clinics (no onboarding choice made yet)
@@ -75,11 +90,18 @@ export default function AdminApp() {
     );
   }
 
+  const navigate = (key) => {
+    setPage(key);
+    setSidebarOpen(false);
+  };
+
   // Conversation detail view
   if (page === 'conversation-detail' && selectedId) {
     return (
       <div className="admin-layout">
-        <Sidebar page={page} setPage={setPage} onLogout={handleLogout} />
+        <MobileTopbar onOpen={() => setSidebarOpen(true)} />
+        {sidebarOpen && <div className="sidebar-overlay open" onClick={() => setSidebarOpen(false)} />}
+        <Sidebar page={page} navigate={navigate} onLogout={handleLogout} open={sidebarOpen} />
         <main className="admin-main">
           <ConversationDetail
             id={selectedId}
@@ -94,7 +116,9 @@ export default function AdminApp() {
 
   return (
     <div className="admin-layout">
-      <Sidebar page={page} setPage={setPage} onLogout={handleLogout} />
+      <MobileTopbar onOpen={() => setSidebarOpen(true)} />
+      {sidebarOpen && <div className="sidebar-overlay open" onClick={() => setSidebarOpen(false)} />}
+      <Sidebar page={page} navigate={navigate} onLogout={handleLogout} open={sidebarOpen} />
       <main className="admin-main">
         <PageComponent
           onViewConversation={(id) => { setSelectedId(id); setPage('conversation-detail'); }}
@@ -104,9 +128,21 @@ export default function AdminApp() {
   );
 }
 
-function Sidebar({ page, setPage, onLogout }) {
+function MobileTopbar({ onOpen }) {
   return (
-    <aside className="admin-sidebar">
+    <div className="mobile-topbar">
+      <button className="hamburger" onClick={onOpen} aria-label="Открыть меню">
+        <span /><span /><span />
+      </button>
+      <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--accent)' }}>🐾 AI-Ветеринар</div>
+      <div style={{ width: 30 }} />
+    </div>
+  );
+}
+
+function Sidebar({ page, navigate, onLogout, open }) {
+  return (
+    <aside className={`admin-sidebar${open ? ' open' : ''}`}>
       <div className="logo">
         <span>🐾</span> AI-Ветеринар
       </div>
@@ -115,7 +151,7 @@ function Sidebar({ page, setPage, onLogout }) {
           <button
             key={key}
             className={`nav-item ${page === key ? 'active' : ''}`}
-            onClick={() => setPage(key)}
+            onClick={() => navigate(key)}
           >
             <span className="icon">{icon}</span>
             {label}

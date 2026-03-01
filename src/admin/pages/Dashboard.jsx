@@ -1,19 +1,37 @@
 import { useState, useEffect } from 'react';
 import { api } from '../lib/api.js';
 
+const STATUS_LABELS = {
+  red: '🔴 Срочно',
+  yellow: '🟡 Внимание',
+  green: '🟢 Стабильно',
+  consultation: '🔵 Консультация',
+  blocked: '⚫ Защита',
+};
+
+const STATUS_BADGE = {
+  red: 'badge-red',
+  yellow: 'badge-yellow',
+  green: 'badge-green',
+  consultation: 'badge-blue',
+  blocked: 'badge-gray',
+};
+
 export default function Dashboard() {
   const [clinic, setClinic] = useState(null);
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     Promise.all([api.getClinic(), api.getAnalytics()])
       .then(([c, a]) => { setClinic(c); setAnalytics(a); })
-      .catch(() => {})
+      .catch((err) => setError(err.message || 'Ошибка загрузки данных'))
       .finally(() => setLoading(false));
   }, []);
 
   if (loading) return <div className="empty-state"><div className="icon">⏳</div>Загрузка...</div>;
+  if (error) return <div className="empty-state"><div className="icon">❌</div>{error}</div>;
 
   return (
     <div>
@@ -61,8 +79,8 @@ export default function Dashboard() {
           <div className="card-title">Статусы диалогов</div>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             {Object.entries(analytics.statusBreakdown).map(([status, count]) => (
-              <span key={status} className={`badge badge-${status === 'red' ? 'red' : status === 'yellow' ? 'yellow' : 'green'}`}>
-                {status}: {count}
+              <span key={status} className={`badge ${STATUS_BADGE[status] || 'badge-green'}`}>
+                {STATUS_LABELS[status] || status}: {count}
               </span>
             ))}
           </div>

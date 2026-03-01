@@ -13,15 +13,36 @@ export default function Billing() {
   const [balance, setBalance] = useState(null);
   const [usage, setUsage] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [planMsg, setPlanMsg] = useState('');
 
   useEffect(() => {
     Promise.all([api.getClinic(), api.getBalance(), api.getUsage()])
       .then(([c, b, u]) => { setClinic(c); setBalance(b); setUsage(u); })
-      .catch(() => {})
+      .catch((err) => setError(err.message || 'Ошибка загрузки данных'))
       .finally(() => setLoading(false));
   }, []);
 
+  const refreshBalance = () => {
+    api.getBalance().then(setBalance).catch(() => {});
+  };
+
+  const handleSelectPlan = async (planId) => {
+    setPlanMsg('');
+    try {
+      const result = await api.createPayment(planId, 'yookassa');
+      if (result.payment_url) {
+        window.open(result.payment_url, '_blank');
+      } else {
+        setPlanMsg('Заявка принята. Тариф будет обновлён после подтверждения.');
+      }
+    } catch (err) {
+      setPlanMsg(`Ошибка: ${err.message}`);
+    }
+  };
+
   if (loading) return <div className="empty-state"><div className="icon">⏳</div>Загрузка...</div>;
+  if (error) return <div className="empty-state"><div className="icon">❌</div>{error}</div>;
 
   const plan = clinic?.plan_id || 'trial';
 
@@ -76,25 +97,31 @@ export default function Billing() {
       </div>
 
       {/* Top Up */}
-      <TopUpCard />
+      <TopUpCard onRefreshBalance={refreshBalance} />
 
       {/* Plans */}
       <div className="card">
         <div className="card-title">Тарифные планы</div>
+        {planMsg && (
+          <div style={{ marginBottom: 16, padding: '10px 16px', borderRadius: 10, background: planMsg.startsWith('Ошибка') ? 'rgba(255,82,82,0.12)' : 'rgba(0,230,118,0.12)', color: planMsg.startsWith('Ошибка') ? '#FF5252' : '#00E676', fontSize: 13 }}>
+            {planMsg}
+          </div>
+        )}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
-          <PlanCard name="Start" price="1 990 ₽/мес" features={['300 диалогов', 'Виджет для сайта', 'Telegram уведомления', 'Кастомный брендинг', 'Базовая аналитика']} current={plan === 'start'} />
-          <PlanCard name="Business" price="4 990 ₽/мес" features={['1000 диалогов', 'Кастомный брендинг', 'Кастомный промпт AI', 'Расширенная аналитика']} current={plan === 'business'} popular />
-          <PlanCard name="Pro" price="9 990 ₽/мес" features={['до 2 000 диалогов', 'Свой TG бот', '10 виджетов и TG-каналов', 'Выбор AI-провайдера']} current={plan === 'pro'} />
+          <PlanCard name="Start" price="1 990 ₽/мес" features={['300 диалогов', 'Виджет для сайта', 'Telegram уведомления', 'Кастомный брендинг', 'Базовая аналитика']} current={plan === 'start'} onSelect={() => handleSelectPlan('start')} />
+          <PlanCard name="Business" price="4 990 ₽/мес" features={['1000 диалогов', 'Кастомный брендинг', 'Кастомный промпт AI', 'Расширенная аналитика']} current={plan === 'business'} popular onSelect={() => handleSelectPlan('business')} />
+          <PlanCard name="Pro" price="9 990 ₽/мес" features={['до 2 000 диалогов', 'Свой TG бот', '10 виджетов и TG-каналов']} current={plan === 'pro'} onSelect={() => handleSelectPlan('pro')} />
         </div>
       </div>
     </div>
   );
 }
 
-function TopUpCard() {
+function TopUpCard({ onRefreshBalance }) {
   const [amount, setAmount] = useState('');
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState('');
+  const [showRefresh, setShowRefresh] = useState(false);
 
   const handleTopup = async () => {
     if (!amount || Number(amount) < 100) {
@@ -103,10 +130,13 @@ function TopUpCard() {
     }
     setLoading(true);
     setMsg('');
+    setShowRefresh(false);
     try {
       const result = await api.topup(Number(amount), 'yookassa');
       if (result.payment_url) {
         window.open(result.payment_url, '_blank');
+        setMsg('Ссылка на оплату открыта. После завершения оплаты обновите баланс.');
+        setShowRefresh(true);
       } else {
         setMsg('Платёж создан. Проверьте статус позже.');
       }
@@ -145,11 +175,20 @@ function TopUpCard() {
         ))}
       </div>
       {msg && <div style={{ marginTop: 10, fontSize: 12, color: msg.startsWith('Ошибка') ? '#FF5252' : '#00E676' }}>{msg}</div>}
+      {showRefresh && (
+        <button
+          className="btn btn-outline"
+          style={{ marginTop: 8, fontSize: 12 }}
+          onClick={() => { onRefreshBalance(); setShowRefresh(false); setMsg(''); }}
+        >
+          🔄 Обновить баланс
+        </button>
+      )}
     </div>
   );
 }
 
-function PlanCard({ name, price, features, current, popular }) {
+function PlanCard({ name, price, features, current, popular, onSelect }) {
   return (
     <div style={{
       padding: 20,
@@ -173,7 +212,7 @@ function PlanCard({ name, price, features, current, popular }) {
       {current ? (
         <div style={{ marginTop: 16, textAlign: 'center', fontSize: 12, color: '#00E676', fontWeight: 600 }}>Текущий план</div>
       ) : (
-        <button className="btn btn-outline" style={{ width: '100%', marginTop: 16, justifyContent: 'center', fontSize: 12 }}>
+        <button className="btn btn-outline" onClick={onSelect} style={{ width: '100%', marginTop: 16, justifyContent: 'center', fontSize: 12 }}>
           Выбрать
         </button>
       )}

@@ -33,20 +33,31 @@ export default function Register({ onSwitch, onLogin }) {
     setError('');
 
     if (slug.length < 3) {
-      setError('Название слишком короткое');
+      setError('Название слишком короткое (минимум 3 символа)');
       return;
     }
 
     setLoading(true);
+
+    // Step 1: Register
     try {
       await api.register({ ...form, slug });
-      const data = await api.login(form.email, form.password);
-      onLogin(data.access_token);
     } catch (err) {
       setError(err.message);
-    } finally {
       setLoading(false);
+      return;
     }
+
+    // Step 2: Auto-login (registration already succeeded)
+    try {
+      const data = await api.login(form.email, form.password);
+      onLogin(data.access_token);
+    } catch {
+      // Registration OK but login failed — ask user to log in manually
+      setError('Аккаунт создан! Войдите с вашим email и паролем.');
+    }
+
+    setLoading(false);
   };
 
   return (
@@ -59,7 +70,7 @@ export default function Register({ onSwitch, onLogin }) {
           <div className="form-group">
             <label className="label">Название клиники</label>
             <input className="input" value={form.clinicName} onChange={update('clinicName')} placeholder="Ветклиника Лапки" required />
-            {slug && (
+            {slug.length >= 3 && (
               <div style={{ fontSize: 11, color: '#546E7A', marginTop: 6, display: 'flex', alignItems: 'center', gap: 4 }}>
                 <span>Адрес виджета:</span>
                 <span style={{ color: '#7C4DFF', fontFamily: "'JetBrains Mono', monospace" }}>
@@ -76,7 +87,20 @@ export default function Register({ onSwitch, onLogin }) {
             <label className="label">Пароль</label>
             <input className="input" type="password" value={form.password} onChange={update('password')} placeholder="Минимум 8 символов" minLength={8} required />
           </div>
-          {error && <div className="form-error">{error}</div>}
+          {error && (
+            <div className="form-error">
+              {error}
+              {error.startsWith('Аккаунт создан') && (
+                <button
+                  type="button"
+                  onClick={onSwitch}
+                  style={{ display: 'block', margin: '8px auto 0', background: 'none', border: 'none', color: '#7C4DFF', cursor: 'pointer', fontSize: 13 }}
+                >
+                  Перейти к входу
+                </button>
+              )}
+            </div>
+          )}
           <button className="btn btn-primary" type="submit" disabled={loading} style={{ width: '100%', marginTop: 16, justifyContent: 'center' }}>
             {loading ? 'Создание...' : 'Начать бесплатно'}
           </button>

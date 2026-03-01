@@ -47,7 +47,7 @@ export default function Settings() {
           <button
             key={key}
             className={`btn ${tab === key ? 'btn-primary' : 'btn-outline'}`}
-            onClick={() => setTab(key)}
+            onClick={() => { setTab(key); setMsg(''); }}
           >
             {label}
           </button>
@@ -68,7 +68,18 @@ export default function Settings() {
 }
 
 function ProfileTab({ clinic, setClinic, onSave, saving }) {
-  const update = (field) => (e) => setClinic({ ...clinic, [field]: e.target.value });
+  const [slugError, setSlugError] = useState('');
+  const update = (field) => (e) => {
+    setClinic({ ...clinic, [field]: e.target.value });
+    if (field === 'slug') setSlugError('');
+  };
+
+  const handleSave = () => {
+    const slug = (clinic.slug || '').trim();
+    if (slug.length < 3) { setSlugError('Минимум 3 символа'); return; }
+    if (!/^[a-z0-9][a-z0-9-]*[a-z0-9]$/.test(slug)) { setSlugError('Только латиница, цифры и дефис. Без пробелов.'); return; }
+    onSave({ name: clinic.name, slug, phone: clinic.phone, city: clinic.city, address: clinic.address });
+  };
 
   return (
     <div className="card">
@@ -79,8 +90,9 @@ function ProfileTab({ clinic, setClinic, onSave, saving }) {
       </div>
       <div className="form-group">
         <label className="label">Slug (URL)</label>
-        <input className="input" value={clinic.slug || ''} onChange={update('slug')} pattern="[a-z0-9-]{3,50}" />
+        <input className="input" value={clinic.slug || ''} onChange={update('slug')} />
         <div style={{ fontSize: 11, color: '#546E7A', marginTop: 4 }}>vetai24.ru/widget/<b>{clinic.slug}</b></div>
+        {slugError && <div style={{ fontSize: 12, color: '#FF5252', marginTop: 4 }}>{slugError}</div>}
       </div>
       <div style={{ display: 'flex', gap: 12 }}>
         <div className="form-group" style={{ flex: 1 }}>
@@ -96,7 +108,7 @@ function ProfileTab({ clinic, setClinic, onSave, saving }) {
         <label className="label">Адрес</label>
         <input className="input" value={clinic.address || ''} onChange={update('address')} />
       </div>
-      <button className="btn btn-primary" onClick={() => onSave({ name: clinic.name, slug: clinic.slug, phone: clinic.phone, city: clinic.city, address: clinic.address })} disabled={saving}>
+      <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
         {saving ? 'Сохранение...' : 'Сохранить'}
       </button>
     </div>

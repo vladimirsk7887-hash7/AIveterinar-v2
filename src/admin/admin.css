@@ -245,6 +245,7 @@ body {
 .badge-red { background: rgba(255,82,82,0.15); color: var(--red); }
 .badge-yellow { background: rgba(255,215,64,0.15); color: var(--yellow); }
 .badge-blue { background: rgba(68,138,255,0.15); color: var(--accent2); }
+.badge-gray { background: rgba(176,190,197,0.15); color: var(--text2); }
 
 .empty-state {
   text-align: center;
@@ -289,8 +290,54 @@ body {
 .form-group { margin-bottom: 16px; }
 .form-error { color: var(--red); font-size: 12px; text-align: center; margin-top: 12px; }
 
+.table-responsive { overflow-x: auto; }
+
+/* Mobile top bar */
+.mobile-topbar {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 56px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 0 16px;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 20;
+}
+
+.hamburger {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 4px;
+}
+
+.hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--text);
+  border-radius: 2px;
+}
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 15;
+}
+
+.sidebar-overlay.open { display: block; }
+
 @media (max-width: 768px) {
-  .admin-sidebar { display: none; }
-  .admin-main { margin-left: 0; padding: 20px 16px; }
+  .mobile-topbar { display: flex; }
+  .admin-sidebar { transform: translateX(-240px); transition: transform 0.25s ease; }
+  .admin-sidebar.open { transform: translateX(0); }
+  .admin-main { margin-left: 0; padding: 76px 16px 20px; }
   .stat-grid { grid-template-columns: repeat(2, 1fr); }
 }
