@@ -92,8 +92,8 @@ app.get('/widget/:slug/{*splat}', sendWidget);
 app.get('/tg', sendTg);
 app.get('/tg/{*splat}', sendTg);
 
-app.get('/max', sendMax);
-app.get('/max/{*splat}', sendMax);
+app.get('/max/:slug', sendMax);
+app.get('/max/:slug/{*splat}', sendMax);
 
 app.get('/landing', sendLanding);
 

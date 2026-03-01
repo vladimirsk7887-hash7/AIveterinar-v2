@@ -16,6 +16,27 @@
   --tg-subtitle: #8e8ea0;
 }
 
+/* Appointment button — replaces Telegram MainButton */
+.tg-appoint-bar {
+  padding: 8px 12px;
+  background: var(--tg-secondary-bg);
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.tg-appoint-btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--tg-btn);
+  color: var(--tg-btn-text);
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.tg-appoint-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.tg-appoint-btn:not(:disabled):active { opacity: 0.8; }
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
