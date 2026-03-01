@@ -1,49 +1,616 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
 
-/* Max не инжектирует CSS-переменные темы — используем дефолтную тёмную тему */
+/* ── Design tokens ── */
 :root {
-  --tg-bg: #1a1a2e;
-  --tg-text: #e0e0e0;
-  --tg-hint: #7a7a8e;
-  --tg-link: #6c8fff;
+  --tg-bg: #0B0E18;
+  --tg-text: #E8EAF0;
+  --tg-hint: #6B7089;
+  --tg-link: #7C8FFF;
   --tg-btn: #7C4DFF;
   --tg-btn-text: #ffffff;
-  --tg-secondary-bg: #12162a;
-  --tg-header-bg: #0d1120;
-  --tg-section-bg: #1e1e36;
+  --tg-secondary-bg: #10142A;
+  --tg-header-bg: #080B14;
+  --tg-section-bg: #141830;
   --tg-accent: #7C4DFF;
-  --tg-destructive: #ff4444;
-  --tg-subtitle: #8e8ea0;
+  --tg-destructive: #FF3B5C;
+  --tg-subtitle: #8B8FA8;
+  --surface: rgba(255, 255, 255, 0.04);
+  --surface-hover: rgba(255, 255, 255, 0.07);
+  --border: rgba(255, 255, 255, 0.06);
+  --border-accent: rgba(124, 77, 255, 0.3);
+  --glow: rgba(124, 77, 255, 0.15);
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
 }
-
-/* Appointment button — replaces Telegram MainButton */
-.tg-appoint-bar {
-  padding: 8px 12px;
-  background: var(--tg-secondary-bg);
-  border-top: 1px solid rgba(255,255,255,0.06);
-}
-.tg-appoint-btn {
-  width: 100%;
-  padding: 12px;
-  background: var(--tg-btn);
-  color: var(--tg-btn-text);
-  border: none;
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.15s;
-}
-.tg-appoint-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.tg-appoint-btn:not(:disabled):active { opacity: 0.8; }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: var(--tg-bg);
   color: var(--tg-text);
   overflow: hidden;
+  min-height: 100vh;
+  min-height: 100dvh;
   -webkit-overflow-scrolling: touch;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* ═══════════════════════════════════════
+   PET SELECT SCREEN
+   ═══════════════════════════════════════ */
+
+.tg-pet-select {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 24px 20px;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(124, 77, 255, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 100%, rgba(108, 143, 255, 0.06) 0%, transparent 50%),
+    var(--tg-bg);
+}
+
+.tg-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.tg-header-label {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+  color: var(--tg-accent);
+  background: rgba(124, 77, 255, 0.12);
+  border: 1px solid rgba(124, 77, 255, 0.2);
+  padding: 5px 14px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+}
+
+.tg-header-title {
+  font-size: 28px;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.tg-header-sub {
+  font-size: 14px;
+  color: var(--tg-subtitle);
+  font-weight: 500;
+}
+
+.tg-pet-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  width: 100%;
+  max-width: 340px;
+}
+
+.tg-pet-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 8px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-appearance: none;
+  appearance: none;
+  color: var(--tg-text);
+  font-family: inherit;
+}
+
+.tg-pet-card:active {
+  transform: scale(0.95);
+  background: var(--surface-hover);
+  border-color: var(--border-accent);
+  box-shadow: 0 0 20px var(--glow);
+}
+
+@media (hover: hover) {
+  .tg-pet-card:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-accent);
+    box-shadow: 0 0 20px var(--glow);
+    transform: translateY(-2px);
+  }
+}
+
+.tg-pet-emoji {
+  font-size: 36px;
+  line-height: 1;
+}
+
+.tg-pet-name {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--tg-subtitle);
+}
+
+/* ═══════════════════════════════════════
+   CHAT SCREEN
+   ═══════════════════════════════════════ */
+
+.tg-chat {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--tg-bg);
+}
+
+/* Status bar */
+.tg-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  flex-shrink: 0;
+}
+
+.tg-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.tg-status-dot.pulse {
+  animation: pulse-glow 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; box-shadow: 0 0 4px currentColor; }
+  50% { opacity: 0.5; box-shadow: 0 0 12px currentColor; }
+}
+
+.tg-status-text {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+/* Patient card */
+.tg-card-section {
+  margin: 0 12px;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.tg-card-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  color: var(--tg-text);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tg-card-body {
+  padding: 0 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tg-card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.tg-card-label {
+  font-size: 12px;
+  color: var(--tg-hint);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.tg-card-value {
+  font-size: 12px;
+  color: var(--tg-text);
+  font-weight: 600;
+  text-align: right;
+}
+
+.tg-symptoms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.tg-symptom-tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: rgba(255, 59, 92, 0.12);
+  color: #FF6B8A;
+  border: 1px solid rgba(255, 59, 92, 0.15);
+}
+
+/* Messages area */
+.tg-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  scrollbar-width: none;
+}
+.tg-messages::-webkit-scrollbar { display: none; }
+
+.tg-msg {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: 85%;
+}
+
+.tg-msg.user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.tg-msg.assistant {
+  align-self: flex-start;
+}
+
+.tg-msg-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--tg-accent), #536DFE);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.tg-msg-bubble {
+  padding: 10px 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 500;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.tg-msg-bubble.assistant {
+  background: var(--tg-section-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md) var(--radius-md) var(--radius-md) 4px;
+  color: var(--tg-text);
+}
+
+.tg-msg-bubble.user {
+  background: linear-gradient(135deg, var(--tg-accent), #5C6BC0);
+  border-radius: var(--radius-md) var(--radius-md) 4px var(--radius-md);
+  color: #fff;
+}
+
+/* Typing indicator */
+.tg-typing {
+  font-size: 20px;
+  letter-spacing: 3px;
+  animation: typing-pulse 1s ease-in-out infinite;
+}
+
+@keyframes typing-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+/* Suggestions */
+.tg-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px 12px 4px;
+  flex-shrink: 0;
+}
+
+.tg-suggestion-btn {
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--tg-link);
+  background: rgba(124, 143, 255, 0.08);
+  border: 1px solid rgba(124, 143, 255, 0.15);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.tg-suggestion-btn:active {
+  background: rgba(124, 143, 255, 0.18);
+  transform: scale(0.96);
+}
+
+@media (hover: hover) {
+  .tg-suggestion-btn:hover {
+    background: rgba(124, 143, 255, 0.15);
+    border-color: rgba(124, 143, 255, 0.3);
+  }
+}
+
+/* Appointment bar */
+.tg-appoint-bar {
+  padding: 8px 12px;
+  flex-shrink: 0;
+}
+
+.tg-appoint-btn {
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, var(--tg-accent), #5C6BC0);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 16px rgba(124, 77, 255, 0.25);
+}
+
+.tg-appoint-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.tg-appoint-btn:not(:disabled):active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 8px rgba(124, 77, 255, 0.3);
+}
+
+/* Input area */
+.tg-input-area {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px 12px;
+  background: var(--tg-secondary-bg);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.tg-input {
+  flex: 1;
+  padding: 11px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--tg-text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.tg-input::placeholder {
+  color: var(--tg-hint);
+}
+
+.tg-input:focus {
+  border-color: var(--border-accent);
+  box-shadow: 0 0 0 3px var(--glow);
+}
+
+.tg-send-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-sm);
+  background: var(--tg-accent);
+  color: #fff;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.tg-send-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.tg-send-btn:not(:disabled):active {
+  transform: scale(0.92);
+}
+
+/* ═══════════════════════════════════════
+   APPOINTMENT SCREEN
+   ═══════════════════════════════════════ */
+
+.tg-appointment {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 24px 16px;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(124, 77, 255, 0.06) 0%, transparent 50%),
+    var(--tg-bg);
+}
+
+.tg-appointment.tg-center {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 12px;
+}
+
+.tg-form-header {
+  margin-bottom: 24px;
+}
+
+.tg-form-header h2 {
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.tg-form-header p {
+  font-size: 14px;
+  color: var(--tg-subtitle);
+  font-weight: 500;
+}
+
+.tg-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tg-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--tg-subtitle);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 10px;
+  margin-bottom: 2px;
+}
+
+.tg-contact-types {
+  display: flex;
+  gap: 8px;
+}
+
+.tg-contact-type {
+  flex: 1;
+  padding: 10px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--tg-hint);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+}
+
+.tg-contact-type.active {
+  color: var(--tg-accent);
+  background: rgba(124, 77, 255, 0.1);
+  border-color: var(--border-accent);
+  box-shadow: 0 0 12px var(--glow);
+}
+
+@media (hover: hover) {
+  .tg-contact-type:not(.active):hover {
+    background: var(--surface-hover);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Status screens (sending/success/error) */
+.tg-spinner {
+  font-size: 40px;
+  animation: spin-bounce 1.2s ease-in-out infinite;
+}
+
+@keyframes spin-bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+.tg-success-icon,
+.tg-error-icon {
+  font-size: 52px;
+  margin-bottom: 4px;
+}
+
+.tg-appointment.tg-center h2 {
+  font-size: 20px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.tg-appointment.tg-center p {
+  font-size: 14px;
+  color: var(--tg-subtitle);
+  font-weight: 500;
+  max-width: 260px;
+  line-height: 1.5;
+}
+
+.tg-retry-btn {
+  padding: 11px 28px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--tg-text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tg-retry-btn:active {
+  background: var(--surface-hover);
+  transform: scale(0.97);
+}
+
+/* ═══════════════════════════════════════
+   UTILITIES & SAFE AREAS
+   ═══════════════════════════════════════ */
+
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .tg-input-area {
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  }
+  .tg-appointment {
+    padding-bottom: calc(24px + env(safe-area-inset-bottom));
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
