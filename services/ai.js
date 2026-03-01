@@ -21,8 +21,8 @@ const MAX_EXPECTED_TOKENS = 4000;
  */
 export async function processAIChat(supabase, clinic, { messages, system }) {
   const config = loadConfig();
-  const providerId = clinic.ai_provider || config.ai.default_provider;
-  const modelId = clinic.ai_model || config.ai.default_model;
+  const providerId = clinic.ai_provider || null;
+  const modelId = clinic.ai_model || null;
   const maxTokens = config.ai.max_completion_tokens;
 
   // Step 1: Atomic reservation

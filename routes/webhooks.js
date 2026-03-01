@@ -7,12 +7,19 @@ import { createLogger } from '../services/logger.js';
 const logger = createLogger();
 const router = Router();
 
+// Official YooKassa IP ranges (https://yookassa.ru/developers/using-api/webhooks)
+const YK_PREFIXES = ['185.71.76.', '185.71.77.', '77.75.153.', '77.75.154.'];
+
 /**
  * POST /api/webhooks/yookassa
  * YooKassa payment confirmation callback.
  */
 router.post('/yookassa', express.raw({ type: 'application/json' }), async (req, res) => {
-  // TODO: Verify YooKassa webhook signature
+  const ip = req.ip || '';
+  if (!YK_PREFIXES.some(p => ip.startsWith(p))) {
+    logger.warn({ ip }, 'YooKassa webhook: IP not in allowlist');
+    return res.status(403).json({ error: 'Forbidden' });
+  }
   try {
     const event = JSON.parse(req.body.toString());
     const paymentId = event.object?.metadata?.payment_id;
@@ -30,18 +37,12 @@ router.post('/yookassa', express.raw({ type: 'application/json' }), async (req, 
           .update({ status: 'completed', completed_at: new Date().toISOString() })
           .eq('id', paymentId);
 
-        // If topup — add to balance
+        // If topup — atomic increment via RPC (avoids race condition on retry)
         if (payment.metadata?.type === 'topup') {
-          const { data: clinic } = await supabaseAdmin
-            .from('clinics')
-            .select('balance_rub')
-            .eq('id', payment.clinic_id)
-            .single();
-
-          await supabaseAdmin
-            .from('clinics')
-            .update({ balance_rub: (clinic?.balance_rub || 0) + payment.amount_rub })
-            .eq('id', payment.clinic_id);
+          await supabaseAdmin.rpc('topup_clinic_balance', {
+            p_clinic_id: payment.clinic_id,
+            p_amount: payment.amount_rub,
+          });
         }
 
         // If subscription — update plan

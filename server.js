@@ -27,9 +27,17 @@ const logger = createLogger();
 // Trust nginx proxy (fixes X-Forwarded-For for rate limiting)
 app.set('trust proxy', 1);
 
+// ─── CORS ───
+// Widget is embedded in third-party sites → open CORS
+// All other API routes are restricted to own origin
+const widgetCors = cors();
+const apiCors = cors({
+  origin: process.env.APP_URL || 'https://vetai24.ru',
+  credentials: true,
+});
+
 // ─── Global middleware ───
 app.use(helmet({ contentSecurityPolicy: false }));
-app.use(cors());
 app.use(requestId);
 app.use(express.json({ limit: '100kb' }));
 
@@ -38,28 +46,28 @@ app.use(express.static(join(__dirname, 'dist'), { index: false }));
 
 // ─── API Routes ───
 import healthRouter from './routes/health.js';
-app.use('/api', healthRouter);
+app.use('/api', apiCors, healthRouter);
 
 import legacyRouter from './routes/legacy.js';
-app.use('/api', legacyRouter);
+app.use('/api', apiCors, legacyRouter);
 
 import widgetRouter from './routes/widget.js';
-app.use('/api/widget', widgetRouter);
+app.use('/api/widget', widgetCors, widgetRouter);
 
 import authRouter from './routes/auth.js';
-app.use('/api/auth', authRouter);
+app.use('/api/auth', apiCors, authRouter);
 
 import clinicRouter from './routes/clinic.js';
-app.use('/api/clinic', clinicRouter);
+app.use('/api/clinic', apiCors, clinicRouter);
 
 import paymentsRouter from './routes/payments.js';
-app.use('/api/payments', paymentsRouter);
+app.use('/api/payments', apiCors, paymentsRouter);
 
 import webhooksRouter from './routes/webhooks.js';
 app.use('/api/webhooks', webhooksRouter);
 
 import adminRouter from './routes/admin.js';
-app.use('/api/admin', adminRouter);
+app.use('/api/admin', apiCors, adminRouter);
 
 import tgWebhookRouter from './routes/tg-webhook.js';
 app.use('/api/tg-webhook', tgWebhookRouter);

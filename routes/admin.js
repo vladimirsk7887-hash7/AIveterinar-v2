@@ -77,6 +77,7 @@ router.post('/clinics', async (req, res) => {
     eventBus.emit('clinic.registered', { clinic_id: clinic.id, email, slug, created_by: 'superadmin' });
     logger.info({ clinic_id: clinic.id, slug, email }, 'Admin: clinic created via concierge');
 
+    res.set('Cache-Control', 'no-store');
     res.status(201).json({
       clinic: {
         id: clinic.id,
@@ -335,7 +336,7 @@ router.post('/ai-providers/test', async (req, res) => {
     openai: 'https://api.openai.com/v1',
   };
 
-  const apiKey = process.env[API_KEY_MAP[provider_id]];
+  const apiKey = (await getApiKey(provider_id).catch(() => null)) || process.env[API_KEY_MAP[provider_id]];
   if (!apiKey) {
     return res.status(400).json({ ok: false, error: 'API key not set' });
   }

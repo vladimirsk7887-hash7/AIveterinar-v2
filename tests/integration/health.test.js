@@ -12,20 +12,5 @@ describe('GET /api/health', () => {
     const res = await request(app).get('/api/health');
     expect(res.status).toBe(200);
     expect(res.body.status).toBe('ok');
-    expect(res.body.version).toBeDefined();
-    expect(res.body.timestamp).toBeDefined();
-  });
-
-  it('includes services object', async () => {
-    const res = await request(app).get('/api/health');
-    expect(res.body.services).toBeDefined();
-    expect(typeof res.body.services.supabase).toBe('boolean');
-    expect(typeof res.body.services.telegram).toBe('boolean');
-  });
-
-  it('timestamp is a valid ISO string', async () => {
-    const res = await request(app).get('/api/health');
-    expect(() => new Date(res.body.timestamp)).not.toThrow();
-    expect(new Date(res.body.timestamp).toISOString()).toBe(res.body.timestamp);
   });
 });

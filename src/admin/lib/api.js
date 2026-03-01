@@ -27,6 +27,7 @@ export const api = {
   updateClinic: (data) => request('/clinic', { method: 'PUT', body: JSON.stringify(data) }),
   requestSetup: (data) => request('/clinic/setup-request', { method: 'POST', body: JSON.stringify(data) }),
   updateBranding: (data) => request('/clinic/branding', { method: 'PUT', body: JSON.stringify(data) }),
+  saveTelegram: (data) => request('/clinic/telegram', { method: 'PUT', body: JSON.stringify(data) }),
   uploadLogo: async (file) => {
     const token = localStorage.getItem('access_token');
     const formData = new FormData();

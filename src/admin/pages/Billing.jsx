@@ -82,9 +82,9 @@ export default function Billing() {
       <div className="card">
         <div className="card-title">Тарифные планы</div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
-          <PlanCard name="Start" price="1 990 ₽/мес" features={['300 диалогов', 'Виджет для сайта', 'Telegram уведомления', 'Базовая аналитика']} current={plan === 'start'} />
-          <PlanCard name="Business" price="4 990 ₽/мес" features={['1000 диалогов', 'Кастомный брендинг', 'Приоритетная поддержка', 'Расширенная аналитика']} current={plan === 'business'} popular />
-          <PlanCard name="Pro" price="9 990 ₽/мес" features={['Безлимит диалогов', 'Свой TG бот', 'API доступ', 'Персональный менеджер']} current={plan === 'pro'} />
+          <PlanCard name="Start" price="1 990 ₽/мес" features={['300 диалогов', 'Виджет для сайта', 'Telegram уведомления', 'Кастомный брендинг', 'Базовая аналитика']} current={plan === 'start'} />
+          <PlanCard name="Business" price="4 990 ₽/мес" features={['1000 диалогов', 'Кастомный брендинг', 'Кастомный промпт AI', 'Расширенная аналитика']} current={plan === 'business'} popular />
+          <PlanCard name="Pro" price="9 990 ₽/мес" features={['до 2 000 диалогов', 'Свой TG бот', '10 виджетов и TG-каналов', 'Выбор AI-провайдера']} current={plan === 'pro'} />
         </div>
       </div>
     </div>

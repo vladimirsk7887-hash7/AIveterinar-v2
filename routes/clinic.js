@@ -2,6 +2,7 @@ import { Router } from 'express';
 import multer from 'multer';
 import { authMiddleware } from '../middleware/auth.js';
 import { supabaseAdmin } from '../db/supabase.js';
+import { encrypt } from '../services/crypto.js';
 import { getClinicAnalytics } from '../services/analytics.js';
 import { eventBus } from '../services/events.js';
 import { createLogger } from '../services/logger.js';
@@ -55,25 +56,46 @@ router.put('/branding', async (req, res) => {
   res.json({ branding: data.settings?.branding || {} });
 });
 
+// Image magic byte signatures — validates actual file content, not client-supplied MIME type
+const MAGIC = {
+  'image/jpeg': [0xFF, 0xD8, 0xFF],
+  'image/png':  [0x89, 0x50, 0x4E, 0x47],
+  'image/gif':  [0x47, 0x49, 0x46],
+  'image/webp': [0x52, 0x49, 0x46, 0x46], // RIFF header (WEBP follows at offset 8)
+};
+
 /** POST /api/clinic/logo — upload logo image to Supabase Storage */
 router.post('/logo', upload.single('logo'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'Файл не выбран' });
-  const allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
-  if (!allowed.includes(req.file.mimetype)) {
-    return res.status(400).json({ error: 'Допустимые форматы: JPG, PNG, GIF, WebP, SVG' });
+  const buf = req.file.buffer;
+  const detectedType = Object.entries(MAGIC).find(([, sig]) => sig.every((b, i) => buf[i] === b))?.[0];
+  if (!detectedType) {
+    return res.status(400).json({ error: 'Допустимые форматы: JPG, PNG, GIF, WebP' });
   }
-  const ext = req.file.mimetype === 'image/svg+xml' ? 'svg' : req.file.mimetype.split('/')[1];
+  const ext = detectedType.split('/')[1];
   const path = `${req.clinic.id}/logo.${ext}`;
 
   await supabaseAdmin.storage.createBucket('logos', { public: true }).catch(() => {});
 
   const { error } = await supabaseAdmin.storage
     .from('logos')
-    .upload(path, req.file.buffer, { contentType: req.file.mimetype, upsert: true });
+    .upload(path, req.file.buffer, { contentType: detectedType, upsert: true });
   if (error) return res.status(400).json({ error: error.message });
 
   const { data: { publicUrl } } = supabaseAdmin.storage.from('logos').getPublicUrl(path);
   res.json({ url: publicUrl });
+});
+
+/** PUT /api/clinic/telegram — save Telegram bot token (encrypted) and chat ID */
+router.put('/telegram', async (req, res) => {
+  const { tg_bot_token, tg_chat_id } = req.body;
+  const updates = { updated_at: new Date().toISOString() };
+  if (tg_bot_token?.trim()) updates.tg_bot_token_encrypted = encrypt(tg_bot_token.trim());
+  if (tg_chat_id?.trim()) updates.tg_chat_ids = [tg_chat_id.trim()];
+  if (Object.keys(updates).length === 1) return res.status(400).json({ error: 'Nothing to update' });
+  const { error } = await supabaseAdmin.from('clinics').update(updates).eq('id', req.clinic.id);
+  if (error) return res.status(400).json({ error: error.message });
+  res.json({ ok: true });
 });
 
 /** GET /api/clinic/widget-code */

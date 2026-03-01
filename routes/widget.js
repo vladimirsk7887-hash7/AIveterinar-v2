@@ -4,6 +4,7 @@ import { widgetRateLimit } from '../middleware/rateLimit.js';
 import { processAIChat } from '../services/ai.js';
 import { eventBus } from '../services/events.js';
 import { createLogger } from '../services/logger.js';
+import { DEFAULT_SYSTEM_PROMPT } from '../config/prompts.js';
 
 const logger = createLogger();
 const router = Router();
@@ -72,7 +73,7 @@ function mergeCard(old, newC) {
  * The critical path: Create/find conversation → Save user msg → AI Call → Save assistant msg → Update conversation.
  */
 router.post('/:slug/chat', async (req, res) => {
-  const { messages, system, petType, sessionId, externalUserId, conversationId } = req.body;
+  const { messages, petType, sessionId, externalUserId, conversationId } = req.body;
 
   if (!messages?.length || !petType) {
     return res.status(400).json({ error: 'Missing messages or petType' });
@@ -130,8 +131,8 @@ router.post('/:slug/chat', async (req, res) => {
 
     // ── 3. AI call with Token Reservation Pattern ──
     const systemPrompt = clinic.custom_prompt
-      ? `${clinic.custom_prompt}\n\n${system || ''}`
-      : system || '';
+      ? `${clinic.custom_prompt}\n\n${DEFAULT_SYSTEM_PROMPT}`
+      : DEFAULT_SYSTEM_PROMPT;
 
     const aiResult = await processAIChat(supabase, clinic, {
       messages,

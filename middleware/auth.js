@@ -29,12 +29,6 @@ export async function authMiddleware(req, res, next) {
 
     // Check if user is superadmin (superadmin doesn't need a clinic)
     const superadminEmail = process.env.SUPERADMIN_EMAIL?.trim();
-    logger.info({
-      user_email: user.email,
-      superadmin_email_set: !!superadminEmail,
-      superadmin_email_value: superadminEmail || 'NOT_SET',
-      is_superadmin: superadminEmail && user.email?.toLowerCase() === superadminEmail.toLowerCase(),
-    }, 'Auth middleware: user resolved');
 
     if (superadminEmail && user.email?.toLowerCase() === superadminEmail.toLowerCase()) {
       req.clinic = null; // Superadmin has no clinic

@@ -2,7 +2,6 @@
  * Widget API adapter — same interface as src/lib/ai.js + src/lib/telegram.js
  * but routes through /api/widget/:slug/* endpoints.
  */
-import { SYSTEM_PROMPT } from '../../lib/constants';
 
 // Extract slug from URL: /widget/:slug
 const slug = window.location.pathname.split('/widget/')[1]?.split('/')[0] || '';
@@ -43,14 +42,13 @@ export async function checkServerKey() {
  * Same signature as src/lib/ai.js callAI(messages, systemOverride)
  * + optional petId for conversation tracking.
  */
-export async function callAI(messages, systemOverride, petId) {
+export async function callAI(messages, _systemOverride, petId) {
   try {
     const response = await fetch(`${API}/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         messages,
-        system: systemOverride || SYSTEM_PROMPT,
         petType: _currentPetType,
         sessionId: getSessionId(),
         conversationId: getConversationId(petId),

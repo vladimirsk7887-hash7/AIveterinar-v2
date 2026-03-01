@@ -7,18 +7,13 @@ const logger = createLogger();
 class EventBus extends EventEmitter {
   emit(eventType, data = {}) {
     logger.debug({ eventType, clinicId: data.clinic_id }, 'Event emitted');
-
-    // Wrap each listener in try-catch so one failure doesn't break others
-    const listeners = this.listeners(eventType);
-    for (const listener of listeners) {
-      Promise.resolve()
-        .then(() => listener(data))
-        .catch((err) => {
-          logger.error({ eventType, error: err.message }, 'Event listener error');
-        });
+    // Use super.emit so once() listeners are properly removed after first call
+    try {
+      return super.emit(eventType, data);
+    } catch (err) {
+      logger.error({ eventType, error: err.message }, 'Event listener error');
+      return false;
     }
-
-    return true;
   }
 }
 

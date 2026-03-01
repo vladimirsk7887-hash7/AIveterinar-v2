@@ -21,6 +21,8 @@ export default function Settings() {
     try {
       if (endpoint === 'branding') {
         await api.updateBranding(data);
+      } else if (endpoint === 'telegram') {
+        await api.saveTelegram(data);
       } else {
         await api.updateClinic(data);
       }
@@ -191,7 +193,7 @@ function TelegramTab({ clinic, setClinic, onSave, saving }) {
         <label className="label">Chat ID</label>
         <input className="input" value={clinic.tg_chat_id || ''} onChange={update('tg_chat_id')} placeholder="-1001234567890" />
       </div>
-      <button className="btn btn-primary" onClick={() => onSave({ tg_bot_token: clinic.tg_bot_token, tg_chat_id: clinic.tg_chat_id })} disabled={saving}>
+      <button className="btn btn-primary" onClick={() => onSave({ tg_bot_token: clinic.tg_bot_token, tg_chat_id: clinic.tg_chat_id }, 'telegram')} disabled={saving}>
         {saving ? 'Сохранение...' : 'Сохранить Telegram'}
       </button>
     </div>
