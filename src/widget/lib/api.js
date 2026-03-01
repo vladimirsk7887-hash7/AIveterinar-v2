@@ -88,6 +88,7 @@ export async function sendToTelegram(text, { ownerName, contactMethod, contactVa
         contactValue: contactValue || 'Не указано',
         petCard: petCard || null,
         summary: text,
+        source: 'widget',
       }),
     });
     const data = await response.json();

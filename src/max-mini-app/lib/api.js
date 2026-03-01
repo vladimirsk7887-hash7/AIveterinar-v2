@@ -52,6 +52,7 @@ export async function callAI(messages, _systemOverride) {
         petType: _currentPetType,
         sessionId: getSessionId(),
         conversationId: getConversationId(),
+        source: 'max',
       }),
     });
     const data = await response.json();
@@ -85,6 +86,7 @@ export async function sendToTelegram(text, { ownerName, contactMethod, contactVa
         contactValue: contactValue || 'Не указано',
         petCard: petCard || null,
         summary: text,
+        source: 'max',
       }),
     });
     const data = await response.json();

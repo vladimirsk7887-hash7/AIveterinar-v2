@@ -73,7 +73,7 @@ function mergeCard(old, newC) {
  * The critical path: Create/find conversation → Save user msg → AI Call → Save assistant msg → Update conversation.
  */
 router.post('/:slug/chat', async (req, res) => {
-  const { messages, petType, sessionId, externalUserId, conversationId } = req.body;
+  const { messages, petType, sessionId, externalUserId, conversationId, source } = req.body;
 
   if (!messages?.length || !petType) {
     return res.status(400).json({ error: 'Missing messages or petType' });
@@ -95,7 +95,7 @@ router.post('/:slug/chat', async (req, res) => {
           session_id: sessionId || null,
           external_user_id: externalUserId || null,
           pet_type: petType,
-          source: 'widget',
+          source: source || 'widget',
           status: 'consultation',
           card: {},
           message_count: 0,
@@ -114,7 +114,7 @@ router.post('/:slug/chat', async (req, res) => {
         clinic_id: clinic.id,
         conversation_id: convId,
         pet_type: petType,
-        source: 'widget',
+        source: source || 'widget',
       });
     }
 
@@ -218,7 +218,7 @@ router.post('/:slug/chat', async (req, res) => {
  * Create an appointment and notify clinic via TG.
  */
 router.post('/:slug/appointment', async (req, res) => {
-  const { conversationId, ownerName, contactMethod, contactValue, petCard, summary } = req.body;
+  const { conversationId, ownerName, contactMethod, contactValue, petCard, summary, source } = req.body;
 
   if (!ownerName || !contactMethod || !contactValue) {
     return res.status(400).json({ error: 'Missing required fields' });
@@ -238,6 +238,7 @@ router.post('/:slug/appointment', async (req, res) => {
         contact_value: contactValue,
         pet_card: petCard || null,
         summary: summary || null,
+        source: source || 'widget',
       })
       .select()
       .single();
