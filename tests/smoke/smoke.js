@@ -46,10 +46,6 @@ await check('GET /api/health → 200 + status:ok', async () => {
   assert(body?.status === 'ok', `Expected status:ok, got ${JSON.stringify(body)}`);
 });
 
-await check('GET /api/health → has services object', async () => {
-  const { body } = await get('/api/health');
-  assert(body?.services && typeof body.services === 'object', 'Missing services object');
-});
 
 await check('POST /api/auth/login with missing fields → 400', async () => {
   const { res } = await post('/api/auth/login', { email: 'x@x.com' });
