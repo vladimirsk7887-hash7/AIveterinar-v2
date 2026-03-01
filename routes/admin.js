@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { randomBytes } from 'crypto';
 import { authMiddleware } from '../middleware/auth.js';
 import { superadminMiddleware } from '../middleware/superadmin.js';
 import { supabaseAdmin } from '../db/supabase.js';
@@ -20,13 +21,10 @@ router.use(superadminMiddleware);
  * Concierge onboarding: superadmin creates a clinic on behalf of the vet.
  */
 router.post('/clinics', async (req, res) => {
-  const { clinicName, email, password, phone, city } = req.body;
+  const { clinicName, email, phone, city } = req.body;
 
-  if (!clinicName || !email || !password) {
-    return res.status(400).json({ error: 'Заполните название, email и пароль' });
-  }
-  if (password.length < 8) {
-    return res.status(400).json({ error: 'Пароль должен быть не менее 8 символов' });
+  if (!clinicName || !email) {
+    return res.status(400).json({ error: 'Заполните название и email' });
   }
 
   try {
@@ -38,10 +36,11 @@ router.post('/clinics', async (req, res) => {
     }
     const slug = await findUniqueSlug(baseSlug);
 
-    // 1. Create auth user
+    // 1. Create auth user with a random temp password (never returned to caller)
+    const tempPassword = randomBytes(16).toString('hex');
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,
-      password,
+      password: tempPassword,
       email_confirm: true,
     });
 
@@ -74,6 +73,18 @@ router.post('/clinics', async (req, res) => {
       return res.status(400).json({ error: clinicError.message });
     }
 
+    // 3. Generate a magic link so the vet can log in without knowing their temp password
+    const appUrl = process.env.APP_URL || 'https://vetai24.ru';
+    const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+      type: 'magiclink',
+      email,
+      options: { redirectTo: `${appUrl}/admin` },
+    });
+    const setupUrl = linkData?.properties?.action_link || null;
+    if (linkError) {
+      logger.warn({ email, error: linkError.message }, 'Admin: failed to generate magic link (non-fatal)');
+    }
+
     eventBus.emit('clinic.registered', { clinic_id: clinic.id, email, slug, created_by: 'superadmin' });
     logger.info({ clinic_id: clinic.id, slug, email }, 'Admin: clinic created via concierge');
 
@@ -86,7 +97,8 @@ router.post('/clinics', async (req, res) => {
         email: clinic.email,
         plan_id: clinic.plan_id,
       },
-      credentials: { email, password },
+      email,
+      setup_url: setupUrl,
     });
   } catch (err) {
     logger.error({ error: err.message }, 'Admin: clinic creation error');

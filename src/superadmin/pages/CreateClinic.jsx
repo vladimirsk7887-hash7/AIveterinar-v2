@@ -18,16 +18,10 @@ function transliterate(text) {
     .slice(0, 50);
 }
 
-function generatePassword() {
-  const chars = 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  return Array.from({ length: 12 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-}
-
 export default function CreateClinic({ token, onBack }) {
   const [form, setForm] = useState({
     clinicName: '',
     email: '',
-    password: generatePassword(),
     phone: '',
     city: '',
   });
@@ -69,10 +63,9 @@ export default function CreateClinic({ token, onBack }) {
     const adminUrl = 'https://vetai24.ru/admin';
     const credText = [
       `Клиника: ${result.clinic.name}`,
-      `Email: ${result.credentials.email}`,
-      `Пароль: ${result.credentials.password}`,
+      `Email: ${result.email}`,
+      `Ссылка для входа: ${result.setup_url || adminUrl}`,
       `Виджет: ${widgetUrl}`,
-      `Админ-панель: ${adminUrl}`,
     ].join('\n');
 
     return (
@@ -85,14 +78,20 @@ export default function CreateClinic({ token, onBack }) {
 
         <div className="card">
           <div className="card-title">Данные для ветеринара</div>
+          <div style={{ padding: '10px 14px', borderRadius: 10, background: 'rgba(68,138,255,0.08)', border: '1px solid rgba(68,138,255,0.2)', fontSize: 12, color: '#90CAF9', marginBottom: 16 }}>
+            Отправьте ветеринару ссылку для входа — она одноразовая и действует 24 часа. После входа пароль можно сменить через «Забыли пароль» на странице входа.
+          </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <CopyField label="Клиника" value={result.clinic.name} onCopy={copyToClipboard} copied={copied} />
             <CopyField label="Slug" value={result.clinic.slug} onCopy={copyToClipboard} copied={copied} />
-            <CopyField label="Email" value={result.credentials.email} onCopy={copyToClipboard} copied={copied} />
-            <CopyField label="Пароль" value={result.credentials.password} onCopy={copyToClipboard} copied={copied} />
+            <CopyField label="Email" value={result.email} onCopy={copyToClipboard} copied={copied} />
             <CopyField label="Виджет" value={widgetUrl} onCopy={copyToClipboard} copied={copied} />
-            <CopyField label="Админ-панель" value={adminUrl} onCopy={copyToClipboard} copied={copied} />
           </div>
+          {result.setup_url && (
+            <div style={{ marginTop: 16 }}>
+              <CopyField label="Ссылка для входа (одноразовая)" value={result.setup_url} onCopy={copyToClipboard} copied={copied} />
+            </div>
+          )}
           <div style={{ marginTop: 20, display: 'flex', gap: 12 }}>
             <button className="btn btn-primary" onClick={() => copyToClipboard(credText, 'all')}>
               {copied === 'all' ? 'Скопировано!' : 'Скопировать всё'}
@@ -143,16 +142,6 @@ export default function CreateClinic({ token, onBack }) {
           <div className="form-group">
             <label className="label">Email *</label>
             <input className="input" type="email" value={form.email} onChange={update('email')} placeholder="clinic@example.com" required />
-          </div>
-
-          <div className="form-group">
-            <label className="label">Пароль *</label>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <input className="input" value={form.password} onChange={update('password')} minLength={8} required style={{ fontFamily: "'JetBrains Mono', monospace" }} />
-              <button type="button" className="btn btn-outline" onClick={() => setForm({ ...form, password: generatePassword() })} style={{ whiteSpace: 'nowrap' }}>
-                Новый
-              </button>
-            </div>
           </div>
 
           <div style={{ display: 'flex', gap: 12 }}>

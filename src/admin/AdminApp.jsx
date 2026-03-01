@@ -22,8 +22,23 @@ const PAGES = {
   events: { label: 'Лог событий', icon: '📜', component: EventLog },
 };
 
+function getInitialToken() {
+  // Handle magic link / OAuth callback: Supabase puts access_token in URL hash
+  const hash = window.location.hash;
+  if (hash.includes('access_token=')) {
+    const params = new URLSearchParams(hash.slice(1));
+    const t = params.get('access_token');
+    if (t) {
+      localStorage.setItem('access_token', t);
+      window.history.replaceState(null, '', window.location.pathname);
+      return t;
+    }
+  }
+  return localStorage.getItem('access_token');
+}
+
 export default function AdminApp() {
-  const [token, setToken] = useState(localStorage.getItem('access_token'));
+  const [token, setToken] = useState(getInitialToken);
   const [page, setPage] = useState('dashboard');
   const [authPage, setAuthPage] = useState('login');
   const [selectedId, setSelectedId] = useState(null);
