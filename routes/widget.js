@@ -201,6 +201,8 @@ router.post('/:slug/chat', async (req, res) => {
 
     res.json({
       text: aiResult.text,
+      visibleText,
+      meta,
       conversationId: convId,
       provider: aiResult.provider,
       model: aiResult.model,

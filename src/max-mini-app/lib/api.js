@@ -60,14 +60,17 @@ export async function callAI(messages, _systemOverride) {
     if (data.conversationId) setConversationId(data.conversationId);
 
     if (data.error === 'limit_reached') {
-      return 'Лимит обращений исчерпан. Пожалуйста, позвоните клинике напрямую.';
+      return { text: 'Лимит обращений исчерпан. Пожалуйста, позвоните клинике напрямую.', meta: null };
     }
     if (!response.ok) {
-      return `Ошибка API (${response.status}): ${data.error || 'Неизвестная ошибка'}`;
+      return { text: `Ошибка API (${response.status}): ${data.error || 'Неизвестная ошибка'}`, meta: null };
     }
-    return data.text || 'Произошла ошибка.';
+    return {
+      text: data.visibleText || data.text || 'Произошла ошибка.',
+      meta: data.meta || null,
+    };
   } catch {
-    return 'Ошибка соединения. Проверьте интернет.';
+    return { text: 'Ошибка соединения. Проверьте интернет.', meta: null };
   }
 }
 

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { STARTER_BUTTONS, STATUS_CONFIG } from '../../lib/constants';
-import { callAI, parseMeta, mergeCard, setCurrentPetType } from '../lib/api';
+import { callAI, mergeCard, setCurrentPetType } from '../lib/api';
 import { useMax } from '../hooks/useMax';
 
 export default function Chat({ petType, userName, onAppointment, chatState, onChatStateChange }) {
@@ -54,12 +54,13 @@ export default function Chat({ petType, userName, onAppointment, chatState, onCh
     setMessages([userMsg]);
     setLoading(true);
 
-    callAI([{ role: 'user', content: initMsg }]).then((reply) => {
-      const { meta, visibleText } = parseMeta(reply);
-      setMessages([userMsg, { role: 'assistant', content: reply, displayText: visibleText }]);
-      setStatus(meta.status || 'consultation');
-      setCard((prev) => mergeCard(prev, meta.card));
-      setSuggestions(meta.suggestions || []);
+    callAI([{ role: 'user', content: initMsg }]).then(({ text, meta }) => {
+      setMessages([userMsg, { role: 'assistant', content: text, displayText: text }]);
+      if (meta) {
+        setStatus(meta.status || 'consultation');
+        setCard((prev) => mergeCard(prev, meta.card));
+        setSuggestions(meta.suggestions || []);
+      }
       setLoading(false);
     });
   }, [petType, messages.length]);
@@ -74,12 +75,13 @@ export default function Chat({ petType, userName, onAppointment, chatState, onCh
     setLoading(true);
     haptic('light');
 
-    const reply = await callAI(updated.map((m) => ({ role: m.role, content: m.content })));
-    const { meta, visibleText } = parseMeta(reply);
-    setMessages([...updated, { role: 'assistant', content: reply, displayText: visibleText }]);
-    setStatus(meta.status || status);
-    setCard((prev) => mergeCard(prev, meta.card));
-    setSuggestions(meta.suggestions || []);
+    const { text: replyText, meta } = await callAI(updated.map((m) => ({ role: m.role, content: m.content })));
+    setMessages([...updated, { role: 'assistant', content: replyText, displayText: replyText }]);
+    if (meta) {
+      setStatus(meta.status || status);
+      setCard((prev) => mergeCard(prev, meta.card));
+      setSuggestions(meta.suggestions || []);
+    }
     setLoading(false);
   }, [messages, loading, status, haptic]);
 
