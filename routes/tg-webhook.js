@@ -4,6 +4,7 @@ import { decrypt } from '../services/crypto.js';
 import { processAIChat } from '../services/ai.js';
 import { eventBus } from '../services/events.js';
 import { createLogger } from '../services/logger.js';
+import { DEFAULT_SYSTEM_PROMPT } from '../config/prompts.js';
 
 const logger = createLogger();
 const router = Router();
@@ -50,7 +51,9 @@ router.post('/:slug', tenantMiddleware, async (req, res) => {
     // Process through AI
     const result = await processAIChat(req.supabase, clinic, {
       messages: [{ role: 'user', content: text }],
-      system: clinic.custom_prompt || '',
+      system: clinic.custom_prompt
+        ? `${clinic.custom_prompt}\n\n${DEFAULT_SYSTEM_PROMPT}`
+        : DEFAULT_SYSTEM_PROMPT,
     });
 
     if (result.error === 'limit_reached') {
