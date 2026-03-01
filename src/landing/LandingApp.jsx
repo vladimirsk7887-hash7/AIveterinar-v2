@@ -54,25 +54,40 @@ export default function LandingApp() {
         button { cursor: pointer; transition: all 0.2s ease; }
         .card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
         .card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -10px rgba(59, 130, 246, 0.15); }
+        @media (max-width: 640px) {
+          .landing-nav { padding: 16px 20px !important; }
+          .landing-nav-links { display: none !important; }
+          .landing-nav-mobile-btn { display: inline-block !important; }
+          .landing-hero { padding: 48px 20px 40px !important; }
+          .landing-hero-desc { font-size: 17px !important; }
+          .landing-grid { grid-template-columns: 1fr !important; }
+          .landing-cta-box { padding: 40px 24px !important; }
+          .landing-cta-title { font-size: 26px !important; }
+          .landing-hero-trust { flex-direction: column; gap: 6px !important; align-items: center; }
+          .landing-hero-trust span[style*="CBD5E1"] { display: none !important; }
+        }
       `}</style>
 
       {/* Nav */}
-      <nav style={{ padding: '20px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: 1200, margin: '0 auto' }}>
+      <nav className="landing-nav" style={{ padding: '20px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: 1200, margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontWeight: 800, fontSize: 20, color: '#0F172A' }}>
           <span style={{ fontSize: 24 }}>🐾</span>
           <span style={{ color: '#3B82F6' }}>AI-Ветеринар</span>
         </div>
-        <div style={{ display: 'flex', gap: 32, alignItems: 'center' }}>
+        <div className="landing-nav-links" style={{ display: 'flex', gap: 32, alignItems: 'center' }}>
           <a href="#features" style={{ fontSize: 15, fontWeight: 500, color: '#475569' }}>Возможности</a>
           <a href="#pricing" style={{ fontSize: 15, fontWeight: 500, color: '#475569' }}>Тарифы</a>
           <a href="/admin" style={{ padding: '10px 24px', borderRadius: 8, background: '#3B82F6', color: '#fff', fontWeight: 600, fontSize: 14 }}>
             Войти
           </a>
         </div>
+        <a className="landing-nav-mobile-btn" href="/admin" style={{ padding: '10px 20px', borderRadius: 8, background: '#3B82F6', color: '#fff', fontWeight: 600, fontSize: 14, display: 'none' }}>
+          Войти
+        </a>
       </nav>
 
       {/* Hero */}
-      <section style={{ textAlign: 'center', padding: '80px 20px 60px', maxWidth: 880, margin: '0 auto' }}>
+      <section className="landing-hero" style={{ textAlign: 'center', padding: '80px 20px 60px', maxWidth: 880, margin: '0 auto' }}>
         <div style={{ display: 'inline-block', padding: '6px 16px', borderRadius: 20, background: '#EFF6FF', color: '#2563EB', fontSize: 13, fontWeight: 600, marginBottom: 24, border: '1px solid #DBEAFE' }}>
           Интеллектуальный SaaS для ветеринарных клиник
         </div>
@@ -82,7 +97,7 @@ export default function LandingApp() {
             ветклиники
           </span>
         </h1>
-        <p style={{ fontSize: 20, color: '#475569', lineHeight: 1.6, maxWidth: 640, margin: '0 auto 40px', fontWeight: 400 }}>
+        <p className="landing-hero-desc" style={{ fontSize: 20, color: '#475569', lineHeight: 1.6, maxWidth: 640, margin: '0 auto 40px', fontWeight: 400 }}>
           Автоматический триаж обращений, сбор анамнеза, запись на приём — круглосуточно и без участия администратора.
         </p>
         <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -93,7 +108,7 @@ export default function LandingApp() {
             Узнать больше
           </a>
         </div>
-        <p style={{ marginTop: 24, fontSize: 13, color: '#64748B', display: 'flex', gap: 12, justifyContent: 'center', alignItems: 'center' }}>
+        <p className="landing-hero-trust" style={{ marginTop: 24, fontSize: 13, color: '#64748B', display: 'flex', gap: 12, justifyContent: 'center', alignItems: 'center' }}>
           <span>✓ 7 дней бесплатно</span>
           <span style={{color: '#CBD5E1'}}>•</span>
           <span>✓ Без привязки карты</span>
@@ -108,7 +123,7 @@ export default function LandingApp() {
           <h2 style={{ fontSize: 36, fontWeight: 800, marginBottom: 16, color: '#0F172A', letterSpacing: '-0.01em' }}>Что получает ваша клиника</h2>
           <p style={{ color: '#475569', fontSize: 16, maxWidth: 600, margin: '0 auto' }}>Всё необходимое для автоматизации первичных обращений и снижения нагрузки на администраторов.</p>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
+        <div className="landing-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
           {FEATURES.map((f) => (
             <div key={f.title} className="card" style={{ padding: 32, borderRadius: 16, background: '#ffffff', border: '1px solid #E2E8F0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05)' }}>
               <div style={{ width: 48, height: 48, borderRadius: 12, background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, marginBottom: 20 }}>
@@ -164,7 +179,7 @@ export default function LandingApp() {
             Единая подписка для клиник любого размера. Расходы на базовый AI уже включены в пакет.
           </p>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
+        <div className="landing-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
           {PLANS.map((plan) => (
              <div key={plan.name} className="card" style={{
               padding: 40, borderRadius: 20,
@@ -223,9 +238,9 @@ export default function LandingApp() {
 
       {/* CTA */}
       <section style={{ padding: '80px 20px', textAlign: 'center', marginBottom: 40 }}>
-        <div style={{ maxWidth: 700, margin: '0 auto', padding: '64px 40px', borderRadius: 24, background: '#0F172A', color: '#fff', boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.25)' }}>
+        <div className="landing-cta-box" style={{ maxWidth: 700, margin: '0 auto', padding: '64px 40px', borderRadius: 24, background: '#0F172A', color: '#fff', boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.25)' }}>
           <div style={{ fontSize: 48, marginBottom: 24 }}>🐾</div>
-          <h2 style={{ fontSize: 32, fontWeight: 800, marginBottom: 16, letterSpacing: '-0.01em' }}>Готовы автоматизировать приём?</h2>
+          <h2 className="landing-cta-title" style={{ fontSize: 32, fontWeight: 800, marginBottom: 16, letterSpacing: '-0.01em' }}>Готовы автоматизировать приём?</h2>
           <p style={{ color: '#94A3B8', fontSize: 18, marginBottom: 32, maxWidth: 480, margin: '0 auto 32px' }}>
             Начните бесплатный 7-дневный период. Настройка займет не более 5 минут.
           </p>
