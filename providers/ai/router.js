@@ -109,11 +109,7 @@ export async function callAI({ messages, system, providerId, modelId, maxTokens 
       lastError = err;
       logger.warn({ provider: pid, model: currentModelId, error: err.message, status: err.status }, 'AI provider failed, trying next');
 
-      // Failover on 5xx, timeout, 429, 400 (model not found)
-      // Only hard-fail on 401/403 (auth errors)
-      if (err.status === 401 || err.status === 403) {
-        throw err;
-      }
+      // Always try next provider (including on 401/403 auth errors)
     }
   }
 
