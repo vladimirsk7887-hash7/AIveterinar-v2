@@ -1,19 +1,39 @@
 import { SYSTEM_PROMPT } from './constants';
 
 export function parseMeta(text) {
-  const metaMatch = text.match(/<meta>([\s\S]*?)<\/meta>/);
   let meta = { status: "consultation", card: {}, suggestions: [] };
+  let visibleText = text;
+
+  // Try <meta>...</meta> format first
+  const metaMatch = text.match(/<meta>([\s\S]*?)<\/meta>/);
   if (metaMatch) {
-    try {
-      meta = JSON.parse(metaMatch[1]);
-    } catch {
-      try {
-        const cleaned = metaMatch[1].replace(/[\n\r]/g, " ").replace(/,\s*}/g, "}").replace(/,\s*]/g, "]");
-        meta = JSON.parse(cleaned);
-      } catch { /* ignore */ }
+    tryParseMeta(metaMatch[1]);
+    visibleText = text.replace(/<meta>[\s\S]*?<\/meta>/, "").trim();
+  } else {
+    // Try ```json ... ``` markdown code block format (DeepSeek style)
+    const codeBlockMatch = text.match(/```(?:json)?\s*\n?([\s\S]*?)```/);
+    if (codeBlockMatch) {
+      const parsed = tryParseMeta(codeBlockMatch[1]);
+      if (parsed) {
+        visibleText = text.replace(/```(?:json)?\s*\n?[\s\S]*?```/, "").trim();
+      }
     }
   }
-  return { meta, visibleText: text.replace(/<meta>[\s\S]*?<\/meta>/, "").trim() };
+
+  function tryParseMeta(raw) {
+    try {
+      meta = JSON.parse(raw);
+      return true;
+    } catch {
+      try {
+        const cleaned = raw.replace(/[\n\r]/g, " ").replace(/,\s*}/g, "}").replace(/,\s*]/g, "]");
+        meta = JSON.parse(cleaned);
+        return true;
+      } catch { return false; }
+    }
+  }
+
+  return { meta, visibleText };
 }
 
 export async function checkServerKey() {

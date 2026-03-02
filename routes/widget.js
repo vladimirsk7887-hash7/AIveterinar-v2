@@ -34,19 +34,31 @@ router.get('/:slug/config', (req, res) => {
  * Parse <meta>...</meta> from AI response (server-side version of parseMeta).
  */
 function parseMeta(text) {
-  const metaMatch = text.match(/<meta>([\s\S]*?)<\/meta>/);
   let meta = { status: 'consultation', card: {}, suggestions: [] };
-  if (metaMatch) {
-    try {
-      meta = JSON.parse(metaMatch[1]);
-    } catch {
+  let visibleText = text;
+
+  function tryParse(raw) {
+    try { meta = JSON.parse(raw); return true; } catch {
       try {
-        const cleaned = metaMatch[1].replace(/[\n\r]/g, ' ').replace(/,\s*}/g, '}').replace(/,\s*]/g, ']');
-        meta = JSON.parse(cleaned);
-      } catch { /* ignore */ }
+        const cleaned = raw.replace(/[\n\r]/g, ' ').replace(/,\s*}/g, '}').replace(/,\s*]/g, ']');
+        meta = JSON.parse(cleaned); return true;
+      } catch { return false; }
     }
   }
-  const visibleText = text.replace(/<meta>[\s\S]*?<\/meta>/, '').trim();
+
+  // Try <meta>...</meta> format
+  const metaMatch = text.match(/<meta>([\s\S]*?)<\/meta>/);
+  if (metaMatch) {
+    tryParse(metaMatch[1]);
+    visibleText = text.replace(/<meta>[\s\S]*?<\/meta>/, '').trim();
+  } else {
+    // Try ```json ... ``` markdown code block (DeepSeek style)
+    const codeBlockMatch = text.match(/```(?:json)?\s*\n?([\s\S]*?)```/);
+    if (codeBlockMatch && tryParse(codeBlockMatch[1])) {
+      visibleText = text.replace(/```(?:json)?\s*\n?[\s\S]*?```/, '').trim();
+    }
+  }
+
   return { meta, visibleText };
 }
 
