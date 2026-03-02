@@ -19,10 +19,11 @@ export default function Appointment({ chatState, userName, onBack }) {
         ?.map((m) => `${m.role === 'user' ? 'Владелец' : 'AI-Ветеринар'}: ${m.displayText || m.content}`)
         .join('\n') || '';
 
-      const summary = await callAI(
+      let summary = await callAI(
         [{ role: 'user', content: historyText }],
         SUMMARY_PROMPT,
       );
+      if (!summary || summary.startsWith('Ошибка')) summary = 'Саммари недоступно';
 
       const statusEmoji = chatState?.status === 'red' ? '🔴'
         : chatState?.status === 'yellow' ? '🟡'

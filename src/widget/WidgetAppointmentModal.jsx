@@ -32,6 +32,7 @@ export default function WidgetAppointmentModal({ pet, messages, onClose }) {
         [{ role: "user", content: `${SUMMARY_PROMPT}\n\nИСТОРИЯ ДИАЛОГА:\n${dialogHistory}` }],
         "Ты помощник ветеринара. Составь краткое саммари обращения на русском языке."
       );
+      if (!summary || summary.startsWith("Ошибка")) summary = "Саммари недоступно";
     } catch {
       summary = "Саммари недоступно";
     }
