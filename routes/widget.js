@@ -50,14 +50,17 @@ function parseMeta(text) {
   const metaMatch = text.match(/<meta>([\s\S]*?)<\/meta>/);
   if (metaMatch) {
     tryParse(metaMatch[1]);
-    visibleText = text.replace(/<meta>[\s\S]*?<\/meta>/, '').trim();
+    visibleText = text.replace(/<meta>[\s\S]*?<\/meta>/g, '').trim();
   } else {
     // Try ```json ... ``` markdown code block (DeepSeek style)
     const codeBlockMatch = text.match(/```(?:json)?\s*\n?([\s\S]*?)```/);
     if (codeBlockMatch && tryParse(codeBlockMatch[1])) {
-      visibleText = text.replace(/```(?:json)?\s*\n?[\s\S]*?```/, '').trim();
+      visibleText = text.replace(/```(?:json)?\s*\n?[\s\S]*?```/g, '').trim();
     }
   }
+
+  // Clean up stray meta tags
+  visibleText = visibleText.replace(/<\/?meta>/g, '').trim();
 
   return { meta, visibleText };
 }

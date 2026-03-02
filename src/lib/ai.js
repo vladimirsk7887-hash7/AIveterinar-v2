@@ -8,17 +8,20 @@ export function parseMeta(text) {
   const metaMatch = text.match(/<meta>([\s\S]*?)<\/meta>/);
   if (metaMatch) {
     tryParseMeta(metaMatch[1]);
-    visibleText = text.replace(/<meta>[\s\S]*?<\/meta>/, "").trim();
+    visibleText = text.replace(/<meta>[\s\S]*?<\/meta>/g, "").trim();
   } else {
     // Try ```json ... ``` markdown code block format (DeepSeek style)
     const codeBlockMatch = text.match(/```(?:json)?\s*\n?([\s\S]*?)```/);
     if (codeBlockMatch) {
       const parsed = tryParseMeta(codeBlockMatch[1]);
       if (parsed) {
-        visibleText = text.replace(/```(?:json)?\s*\n?[\s\S]*?```/, "").trim();
+        visibleText = text.replace(/```(?:json)?\s*\n?[\s\S]*?```/g, "").trim();
       }
     }
   }
+
+  // Clean up any stray meta tags the AI might leave
+  visibleText = visibleText.replace(/<\/?meta>/g, "").trim();
 
   function tryParseMeta(raw) {
     try {
