@@ -51,6 +51,14 @@ export function setupEventListeners(config) {
   eventBus.on('appointment.created', async (data) => {
     const { owner_name, contact_method, contact_value, summary, tg_chat_ids, max_bot_token_encrypted, max_chat_id } = data;
 
+    logger.info({
+      hasTgChatIds: !!(tg_chat_ids?.length),
+      tgCount: tg_chat_ids?.length || 0,
+      hasMaxToken: !!max_bot_token_encrypted,
+      hasMaxChatId: !!max_chat_id,
+      maxChatId: max_chat_id || null,
+    }, 'appointment.created — notification check');
+
     const text = [
       '🐾 **Новая запись на приём**',
       `**Владелец:** ${owner_name}`,
@@ -60,17 +68,23 @@ export function setupEventListeners(config) {
 
     // Telegram notification
     if (tg_chat_ids?.length) {
-      notifyClinicChats(tg_chat_ids, text.replace(/\*\*/g, '')).catch(() => {});
+      notifyClinicChats(tg_chat_ids, text.replace(/\*\*/g, '')).catch((err) => {
+        logger.error({ error: err.message }, 'TG notify failed');
+      });
     }
 
     // Max notification
     if (max_chat_id && max_bot_token_encrypted) {
       try {
         const maxToken = decrypt(max_bot_token_encrypted);
-        sendMaxMessage(maxToken, max_chat_id, text).catch(() => {});
+        logger.info({ maxChatId: max_chat_id, tokenLen: maxToken.length }, 'Sending Max notification');
+        const sent = await sendMaxMessage(maxToken, max_chat_id, text);
+        logger.info({ sent, maxChatId: max_chat_id }, 'Max notification result');
       } catch (err) {
         logger.error({ error: err.message }, 'Max token decrypt failed');
       }
+    } else {
+      logger.warn({ max_chat_id, hasToken: !!max_bot_token_encrypted }, 'Max notification skipped — missing credentials');
     }
   });
 
