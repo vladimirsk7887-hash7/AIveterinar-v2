@@ -16,9 +16,11 @@ export default function Billing() {
   const [error, setError] = useState('');
   const [planMsg, setPlanMsg] = useState('');
 
+  const [analytics, setAnalytics] = useState(null);
+
   useEffect(() => {
-    Promise.all([api.getClinic(), api.getBalance(), api.getUsage()])
-      .then(([c, b, u]) => { setClinic(c); setBalance(b); setUsage(u); })
+    Promise.all([api.getClinic(), api.getBalance(), api.getUsage(), api.getAnalytics()])
+      .then(([c, b, u, a]) => { setClinic(c); setBalance(b); setUsage(u); setAnalytics(a); })
       .catch((err) => setError(err.message || 'Ошибка загрузки данных'))
       .finally(() => setLoading(false));
   }, []);
@@ -68,7 +70,7 @@ export default function Billing() {
         )}
       </div>
 
-      {/* Balance + Usage Stats */}
+      {/* Balance + Value Stats */}
       <div className="stat-grid">
         <div className="stat-card">
           <div className="stat-value" style={{ color: (balance?.balance_rub ?? 0) > 0 ? '#00E676' : '#FF5252' }}>
@@ -78,15 +80,15 @@ export default function Billing() {
         </div>
         <div className="stat-card">
           <div className="stat-value">
-            {usage?.conversations_this_month ?? 0}
+            {analytics?.conversations ?? 0}
           </div>
-          <div className="stat-label">Диалогов в этом месяце</div>
+          <div className="stat-label">Диалогов за месяц</div>
         </div>
         <div className="stat-card">
-          <div className="stat-value" style={{ fontSize: 20 }}>
-            {usage?.cost_rub ? `${usage.cost_rub.toFixed(0)} ₽` : '—'}
+          <div className="stat-value" style={{ color: '#00E676' }}>
+            {analytics?.appointments ?? 0}
           </div>
-          <div className="stat-label">Расходы на AI</div>
+          <div className="stat-label">Доп. клиентов (записи)</div>
         </div>
       </div>
 

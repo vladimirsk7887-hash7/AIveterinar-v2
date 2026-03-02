@@ -9,7 +9,7 @@ import ConversationDetail from './pages/ConversationDetail.jsx';
 import Appointments from './pages/Appointments.jsx';
 import WidgetSetup from './pages/WidgetSetup.jsx';
 import Billing from './pages/Billing.jsx';
-import EventLog from './pages/EventLog.jsx';
+// import EventLog from './pages/EventLog.jsx'; // temporarily hidden
 import { api } from './lib/api.js';
 
 const PAGES = {
@@ -19,7 +19,6 @@ const PAGES = {
   widget: { label: 'Виджет', icon: '🔌', component: WidgetSetup },
   settings: { label: 'Настройки', icon: '⚙️', component: Settings },
   billing: { label: 'Биллинг', icon: '💳', component: Billing },
-  events: { label: 'Лог событий', icon: '📜', component: EventLog },
 };
 
 function getInitialToken() {
