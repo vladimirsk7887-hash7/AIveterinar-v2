@@ -39,8 +39,7 @@ export default function Appointment({ chatState, userName, onBack }) {
         card.symptoms?.length && `Симптомы: ${card.symptoms.join(', ')}`,
       ].filter(Boolean).join('\n');
 
-      const contactLabel = contactType === 'telegram' ? 'Telegram'
-        : contactType === 'whatsapp' ? 'WhatsApp' : 'Телефон';
+      const contactLabel = contactType === 'telegram' ? 'Telegram' : 'Телефон';
 
       const message = [
         `${statusEmoji} <b>НОВАЯ ЗАПИСЬ НА ПРИЁМ</b>`,
@@ -133,7 +132,6 @@ export default function Appointment({ chatState, userName, onBack }) {
         <div className="tg-contact-types">
           {[
             { key: 'telegram', label: 'Telegram', icon: '💬' },
-            { key: 'whatsapp', label: 'WhatsApp', icon: '📱' },
             { key: 'phone', label: 'Телефон', icon: '📞' },
           ].map((ct) => (
             <button
@@ -147,9 +145,7 @@ export default function Appointment({ chatState, userName, onBack }) {
         </div>
 
         <label className="tg-label">
-          {contactType === 'telegram' ? 'Telegram username или номер'
-            : contactType === 'whatsapp' ? 'Номер WhatsApp'
-              : 'Номер телефона'}
+          {contactType === 'telegram' ? 'Telegram username или номер' : 'Номер телефона'}
         </label>
         <input
           className="tg-input"

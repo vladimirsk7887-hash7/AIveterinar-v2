@@ -14,7 +14,6 @@ export default function WidgetAppointmentModal({ pet, messages, onClose }) {
   const contactMethods = [
     { id: "telegram", icon: "✈️", label: "Telegram", placeholder: "@username или номер" },
     { id: "max", icon: "💬", label: "Max", placeholder: "@username в Max" },
-    { id: "whatsapp", icon: "📱", label: "WhatsApp", placeholder: "+7 (999) 123-45-67" },
     { id: "phone", icon: "📞", label: "Телефон", placeholder: "+7 (999) 123-45-67" },
   ];
 
