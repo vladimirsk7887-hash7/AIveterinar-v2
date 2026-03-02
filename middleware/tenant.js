@@ -20,7 +20,7 @@ export async function tenantMiddleware(req, res, next) {
     // 1. Find clinic by slug (via service_role — single SELECT)
     const { data: clinic, error } = await supabaseAdmin
       .from('clinics')
-      .select('id, is_active, plan_id, ai_provider, ai_model, balance_rub, tg_chat_ids, tg_bot_token_encrypted, primary_color, secondary_color, welcome_message, custom_prompt, settings')
+      .select('id, is_active, plan_id, ai_provider, ai_model, balance_rub, tg_chat_ids, tg_bot_token_encrypted, max_bot_token_encrypted, max_chat_id, primary_color, secondary_color, welcome_message, custom_prompt, settings')
       .eq('slug', slug)
       .single();
 
