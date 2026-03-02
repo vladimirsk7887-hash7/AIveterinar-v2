@@ -98,6 +98,18 @@ router.put('/telegram', async (req, res) => {
   res.json({ ok: true });
 });
 
+/** PUT /api/clinic/max — save Max bot token (encrypted) and chat ID */
+router.put('/max', async (req, res) => {
+  const { max_bot_token, max_chat_id } = req.body;
+  const updates = { updated_at: new Date().toISOString() };
+  if (max_bot_token?.trim()) updates.max_bot_token_encrypted = encrypt(max_bot_token.trim());
+  if (max_chat_id?.trim()) updates.max_chat_id = max_chat_id.trim();
+  if (Object.keys(updates).length === 1) return res.status(400).json({ error: 'Nothing to update' });
+  const { error } = await supabaseAdmin.from('clinics').update(updates).eq('id', req.clinic.id);
+  if (error) return res.status(400).json({ error: error.message });
+  res.json({ ok: true });
+});
+
 /** GET /api/clinic/widget-code */
 router.get('/widget-code', (req, res) => {
   const slug = req.clinic.slug;

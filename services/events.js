@@ -1,6 +1,9 @@
 import { EventEmitter } from 'events';
 import { supabaseAdmin } from '../db/supabase.js';
 import { createLogger } from './logger.js';
+import { notifyClinicChats } from './telegram.js';
+import { sendMaxMessage } from './max.js';
+import { decrypt } from './crypto.js';
 
 const logger = createLogger();
 
@@ -43,6 +46,33 @@ export function setupEventListeners(config) {
       }
     });
   }
+
+  // Send appointment notifications via Telegram and Max
+  eventBus.on('appointment.created', async (data) => {
+    const { owner_name, contact_method, contact_value, summary, tg_chat_ids, max_bot_token_encrypted, max_chat_id } = data;
+
+    const text = [
+      '🐾 **Новая запись на приём**',
+      `**Владелец:** ${owner_name}`,
+      `**Контакт:** ${contact_method} — ${contact_value}`,
+      summary ? `\n${summary}` : '',
+    ].filter(Boolean).join('\n');
+
+    // Telegram notification
+    if (tg_chat_ids?.length) {
+      notifyClinicChats(tg_chat_ids, text.replace(/\*\*/g, '')).catch(() => {});
+    }
+
+    // Max notification
+    if (max_chat_id && max_bot_token_encrypted) {
+      try {
+        const maxToken = decrypt(max_bot_token_encrypted);
+        sendMaxMessage(maxToken, max_chat_id, text).catch(() => {});
+      } catch (err) {
+        logger.error({ error: err.message }, 'Max token decrypt failed');
+      }
+    }
+  });
 
   logger.info({ count: tracked.length }, 'Event listeners registered');
 }

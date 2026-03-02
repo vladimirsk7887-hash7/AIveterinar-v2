@@ -23,6 +23,8 @@ export default function Settings() {
         await api.updateBranding(data);
       } else if (endpoint === 'telegram') {
         await api.saveTelegram(data);
+      } else if (endpoint === 'max') {
+        await api.saveMax(data);
       } else {
         await api.updateClinic(data);
       }
@@ -63,7 +65,7 @@ export default function Settings() {
       {tab === 'profile' && <ProfileTab clinic={clinic} setClinic={setClinic} onSave={save} saving={saving} />}
       {tab === 'branding' && <BrandingTab clinic={clinic} setClinic={setClinic} onSave={save} saving={saving} />}
       {tab === 'telegram' && <TelegramTab clinic={clinic} setClinic={setClinic} onSave={save} saving={saving} />}
-      {tab === 'max' && <MaxTab clinic={clinic} />}
+      {tab === 'max' && <MaxTab clinic={clinic} setClinic={setClinic} onSave={save} saving={saving} />}
     </div>
   );
 }
@@ -189,8 +191,9 @@ function BrandingTab({ clinic, setClinic, onSave, saving }) {
   );
 }
 
-function MaxTab({ clinic }) {
+function MaxTab({ clinic, setClinic, onSave, saving }) {
   const [copied, setCopied] = useState(false);
+  const [maxToken, setMaxToken] = useState('');
   const url = `https://vetai24.ru/max/${clinic.slug || ''}`;
 
   const copy = () => {
@@ -200,13 +203,23 @@ function MaxTab({ clinic }) {
     });
   };
 
+  const handleSave = () => {
+    const data = {};
+    if (maxToken.trim()) data.max_bot_token = maxToken.trim();
+    if (clinic.max_chat_id?.trim()) data.max_chat_id = clinic.max_chat_id.trim();
+    if (!Object.keys(data).length) return;
+    onSave(data, 'max');
+    if (maxToken) setMaxToken('');
+  };
+
   return (
     <div className="card">
       <div className="card-title">Max — мессенджер</div>
       <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(0,230,118,0.07)', border: '1px solid rgba(0,230,118,0.2)', fontSize: 12, color: '#69F0AE', marginBottom: 20 }}>
-        Max Mini-App подключается без токенов — достаточно указать ссылку ниже при настройке бота.
-        Уведомления о записях отправляются через Telegram-интеграцию (вкладка Telegram).
+        Уведомления о новых записях будут отправляться в ваш канал/группу Max.
+        Если Telegram заблокируют — уведомления продолжат работать.
       </div>
+
       <div className="form-group">
         <label className="label">URL мини-аппа</label>
         <div style={{ display: 'flex', gap: 8 }}>
@@ -221,17 +234,51 @@ function MaxTab({ clinic }) {
           </button>
         </div>
         <div style={{ fontSize: 11, color: '#546E7A', marginTop: 6 }}>
-          Укажите эту ссылку в настройках вашего бота в мессенджере Max в поле «Web App URL».
+          Укажите в настройках бота в поле «Web App URL».
         </div>
       </div>
-      <div style={{ marginTop: 8, padding: '12px 16px', borderRadius: 10, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', fontSize: 12 }}>
-        <div style={{ fontWeight: 700, marginBottom: 8, fontSize: 13 }}>Как подключить</div>
+
+      <div style={{ height: 1, background: 'var(--border)', margin: '16px 0' }} />
+      <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 12 }}>Уведомления о записях в Max</div>
+
+      <div className="form-group">
+        <label className="label">Bot Token (access_token)</label>
+        <input
+          className="input"
+          value={maxToken}
+          onChange={(e) => setMaxToken(e.target.value)}
+          placeholder="Вставьте токен бота из Max Developer Portal"
+          type="password"
+        />
+        <div style={{ fontSize: 11, color: '#546E7A', marginTop: 4 }}>
+          {clinic.max_bot_token_encrypted ? '✓ Токен сохранён (введите новый для замены)' : 'Токен не настроен'}
+        </div>
+      </div>
+      <div className="form-group">
+        <label className="label">Chat ID канала/группы</label>
+        <input
+          className="input"
+          value={clinic.max_chat_id || ''}
+          onChange={(e) => setClinic({ ...clinic, max_chat_id: e.target.value })}
+          placeholder="-100123456789"
+        />
+        <div style={{ fontSize: 11, color: '#546E7A', marginTop: 4 }}>
+          Числовой ID чата. Бот должен быть администратором канала.
+        </div>
+      </div>
+
+      <div style={{ padding: '10px 16px', borderRadius: 10, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', fontSize: 12, marginBottom: 16 }}>
+        <div style={{ fontWeight: 700, marginBottom: 6, fontSize: 13 }}>Как получить Chat ID</div>
         <ol style={{ margin: 0, paddingLeft: 18, lineHeight: 1.9, color: '#90A4AE' }}>
-          <li>Зайдите в настройки вашего бота в Max</li>
-          <li>В поле <b style={{ color: '#CFD8DC' }}>Web App URL</b> вставьте ссылку выше</li>
-          <li>Сохраните — кнопка запуска мини-аппа появится в чате бота</li>
+          <li>Добавьте бота администратором в канал/группу</li>
+          <li>Откройте: <span style={{ fontFamily: 'monospace', color: '#CFD8DC' }}>https://platform-api.max.ru/chats</span> с токеном бота в заголовке Authorization</li>
+          <li>Скопируйте поле <b style={{ color: '#CFD8DC' }}>chat_id</b> нужного чата</li>
         </ol>
       </div>
+
+      <button className="btn btn-primary" onClick={handleSave} disabled={saving || (!maxToken.trim() && !clinic.max_chat_id?.trim())}>
+        {saving ? 'Сохранение...' : 'Сохранить Max'}
+      </button>
     </div>
   );
 }

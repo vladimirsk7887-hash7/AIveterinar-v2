@@ -250,13 +250,16 @@ router.post('/:slug/appointment', async (req, res) => {
       return res.status(500).json({ error: 'Failed to create appointment' });
     }
 
-    // Notify clinic via TG (async, don't block)
+    // Notify clinic via TG and Max (async, don't block)
     eventBus.emit('appointment.created', {
       clinic_id: clinic.id,
       appointment_id: appointment.id,
       owner_name: ownerName,
       contact_method: contactMethod,
+      contact_value: contactValue,
       tg_chat_ids: clinic.tg_chat_ids,
+      max_bot_token_encrypted: clinic.max_bot_token_encrypted || null,
+      max_chat_id: clinic.max_chat_id || null,
       summary,
     });
 
