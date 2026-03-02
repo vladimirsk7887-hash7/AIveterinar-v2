@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { SUMMARY_PROMPT } from '../../lib/constants';
-import { callAI, sendToTelegram } from '../lib/api';
+import { callAI, sendToTelegram, parseMeta } from '../lib/api';
 import { useMax } from '../hooks/useMax';
 
 export default function Appointment({ chatState, userName, onBack }) {
@@ -23,7 +23,9 @@ export default function Appointment({ chatState, userName, onBack }) {
         [{ role: 'user', content: historyText }],
         SUMMARY_PROMPT,
       );
-      if (!summary || summary.startsWith('Ошибка')) summary = 'Саммари недоступно';
+      const { visibleText } = parseMeta(summary || '');
+      summary = visibleText?.trim() || '';
+      if (!summary || summary.startsWith('Ошибка') || summary.startsWith('{')) summary = 'Саммари недоступно';
 
       const statusEmoji = chatState?.status === 'red' ? '🔴'
         : chatState?.status === 'yellow' ? '🟡'

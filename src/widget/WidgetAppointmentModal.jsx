@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { callAI, sendToTelegram } from './lib/api';
+import { callAI, sendToTelegram, parseMeta } from './lib/api';
 import { SUMMARY_PROMPT } from '../lib/constants';
 
 export default function WidgetAppointmentModal({ pet, messages, onClose }) {
@@ -32,8 +32,10 @@ export default function WidgetAppointmentModal({ pet, messages, onClose }) {
         [{ role: "user", content: `${SUMMARY_PROMPT}\n\nИСТОРИЯ ДИАЛОГА:\n${dialogHistory}` }],
         "Ты помощник ветеринара. Составь краткое саммари обращения на русском языке."
       );
-      const t = summary?.trim();
-      if (!t || t.startsWith("Ошибка") || t.startsWith("{") || t.startsWith("<")) summary = "Саммари недоступно";
+      // Strip <meta> blocks from AI response, then validate
+      const { visibleText } = parseMeta(summary || '');
+      summary = visibleText?.trim() || '';
+      if (!summary || summary.startsWith("Ошибка") || summary.startsWith("{")) summary = "Саммари недоступно";
     } catch {
       summary = "Саммари недоступно";
     }
