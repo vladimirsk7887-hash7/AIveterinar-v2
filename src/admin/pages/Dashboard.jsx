@@ -1,6 +1,13 @@
 import { useState, useEffect } from 'react';
 import { api } from '../lib/api.js';
 
+const PLAN_NAMES = {
+  trial: 'Пробный',
+  start: 'Старт',
+  business: 'Бизнес',
+  pro: 'Про',
+};
+
 const STATUS_LABELS = {
   red: '🔴 Срочно',
   yellow: '🟡 Внимание',
@@ -43,7 +50,7 @@ export default function Dashboard() {
             <div>
               <div style={{ fontSize: 18, fontWeight: 700 }}>{clinic.name}</div>
               <div style={{ color: '#546E7A', fontSize: 12, marginTop: 4, fontFamily: "'JetBrains Mono', monospace" }}>
-                /{clinic.slug} · Тариф: {clinic.plan_id}
+                /{clinic.slug} · Тариф: {PLAN_NAMES[clinic.plan_id] || clinic.plan_id}
               </div>
             </div>
             <span className={`badge ${clinic.is_active ? 'badge-green' : 'badge-red'}`}>

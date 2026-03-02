@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { api } from '../lib/api.js';
 
 const PLAN_NAMES = {
-  trial: 'Trial (7 дней)',
-  start: 'Start',
-  business: 'Business',
-  pro: 'Pro',
+  trial: 'Пробный (7 дней)',
+  start: 'Старт',
+  business: 'Бизнес',
+  pro: 'Про',
 };
 
 export default function Billing() {
@@ -108,9 +108,9 @@ export default function Billing() {
           </div>
         )}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
-          <PlanCard name="Start" price="1 990 ₽/мес" features={['300 диалогов', 'Виджет для сайта', 'Telegram уведомления', 'Кастомный брендинг', 'Базовая аналитика']} current={plan === 'start'} onSelect={() => handleSelectPlan('start')} />
-          <PlanCard name="Business" price="4 990 ₽/мес" features={['1000 диалогов', 'Кастомный брендинг', 'Кастомный промпт AI', 'Расширенная аналитика']} current={plan === 'business'} popular onSelect={() => handleSelectPlan('business')} />
-          <PlanCard name="Pro" price="9 990 ₽/мес" features={['до 2 000 диалогов', 'Свой TG бот', '10 виджетов и TG-каналов']} current={plan === 'pro'} onSelect={() => handleSelectPlan('pro')} />
+          <PlanCard name="Старт" price="1 990 ₽/мес" features={['300 диалогов', 'Виджет для сайта', 'Telegram уведомления', 'Кастомный брендинг', 'Базовая аналитика']} current={plan === 'start'} onSelect={() => handleSelectPlan('start')} />
+          <PlanCard name="Бизнес" price="4 990 ₽/мес" features={['1000 диалогов', 'Кастомный брендинг', 'Кастомный промпт AI', 'Расширенная аналитика']} current={plan === 'business'} popular onSelect={() => handleSelectPlan('business')} />
+          <PlanCard name="Про" price="9 990 ₽/мес" features={['до 2 000 диалогов', 'Свой TG бот', '10 виджетов и TG-каналов']} current={plan === 'pro'} onSelect={() => handleSelectPlan('pro')} />
         </div>
       </div>
     </div>
