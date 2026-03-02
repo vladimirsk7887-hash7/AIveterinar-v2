@@ -6,7 +6,7 @@ const PLANS = [
     features: [
       'Быстрая AI-модель (сбор контактов и запись)',
       'Виджет для сайта',
-      'Telegram-уведомления',
+      'Уведомления в Telegram и Max',
       'Кастомный брендинг виджета (логотип, цвета)',
       'При исчерпании пакета — безопасная блокировка AI (переход в режим формы)'
     ]
@@ -17,7 +17,7 @@ const PLANS = [
     conversations: 'до 1 000 диалогов/мес (включен расширенный пакет токенов)',
     features: [
       'Кастомный промпт и брендинг',
-      'Подключение до 3 виджетов и Telegram-каналов',
+      'Подключение до 3 каналов: сайт, Telegram, Max',
       'Сверх лимита — прозрачная оплата с баланса клиники (3 ₽/1K токенов)'
     ],
     popular: true
@@ -27,16 +27,44 @@ const PLANS = [
     price: '9 990',
     conversations: 'Максимальный пакет токенов (~2 000 диалогов)',
     features: [
-      'Подключение собственного Telegram-бота клиники',
+      'Подключение собственного бота (Telegram или Max)',
       'Защита от перерасхода: аварийный лимит (Hard Cap)',
       'Льготная стоимость дополнительных токенов (1.5 ₽/1K)'
     ]
   },
 ];
 
+const CHANNELS = [
+  {
+    icon: '🌐',
+    title: 'Виджет на сайте',
+    desc: 'Одна строка кода — и AI-ассистент появляется на вашем сайте. Полный брендинг: логотип, цвета, промпт.',
+    tag: 'Для сайта',
+    tagColor: '#EFF6FF',
+    tagText: '#2563EB',
+  },
+  {
+    icon: '✈️',
+    title: 'Telegram-бот',
+    desc: 'Мини-апп прямо в Telegram. Клиенты открывают его из вашего бота — без скачивания приложений.',
+    tag: 'Telegram',
+    tagColor: '#F0FDF4',
+    tagText: '#15803D',
+  },
+  {
+    icon: '💬',
+    title: 'Max мини-апп',
+    desc: 'Полноценный AI-ассистент в мессенджере Max. Российская альтернатива Telegram с аудиторией 10+ млн.',
+    tag: 'Max',
+    tagColor: '#FFF7ED',
+    tagText: '#C2410C',
+    isNew: true,
+  },
+];
+
 const FEATURES = [
   { icon: '🤖', title: 'AI-триаж 24/7', desc: 'Автоматическая оценка срочности обращения. Красный / жёлтый / зелёный — моментально.' },
-  { icon: '📋', title: 'Запись на приём', desc: 'Бот собирает анамнез и записывает клиента. Уведомление — в Telegram клиники.' },
+  { icon: '📋', title: 'Запись на приём', desc: 'Бот собирает анамнез и записывает клиента. Уведомление — в Telegram или Max клиники.' },
   { icon: '🎨', title: 'Ваш бренд', desc: 'Логотип, цвета, промпт — виджет выглядит как часть вашего сайта.' },
   { icon: '📊', title: 'Аналитика', desc: 'Сколько обращений, конверсия в записи, расходы на AI — всё в одном дашборде.' },
   { icon: '🔌', title: 'Установка за 2 минуты', desc: 'Одна строка кода на сайт. Никаких настроек серверов, SSL-сертификатов.' },
@@ -65,6 +93,7 @@ export default function LandingApp() {
           .landing-hero-btns { flex-direction: column !important; align-items: stretch !important; }
           .landing-hero-btns a { text-align: center; }
           .landing-grid { grid-template-columns: 1fr !important; }
+          .landing-channels-grid { grid-template-columns: 1fr !important; }
           .landing-pricing-grid { grid-template-columns: 1fr !important; }
           .landing-cta-box { padding: 40px 24px !important; }
           .landing-cta-title { font-size: 26px !important; }
@@ -81,6 +110,7 @@ export default function LandingApp() {
         </div>
         <div className="landing-nav-links" style={{ display: 'flex', gap: 32, alignItems: 'center' }}>
           <a href="#features" style={{ fontSize: 15, fontWeight: 500, color: '#475569' }}>Возможности</a>
+          <a href="#channels" style={{ fontSize: 15, fontWeight: 500, color: '#475569' }}>Каналы</a>
           <a href="#pricing" style={{ fontSize: 15, fontWeight: 500, color: '#475569' }}>Тарифы</a>
           <a href="/admin" style={{ padding: '10px 24px', borderRadius: 8, background: '#3B82F6', color: '#fff', fontWeight: 600, fontSize: 14 }}>
             Войти
@@ -119,6 +149,37 @@ export default function LandingApp() {
         </p>
       </section>
 
+      {/* Channels */}
+      <section id="channels" style={{ padding: '0 20px 80px', maxWidth: 1100, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: 40 }}>
+          <h2 style={{ fontSize: 28, fontWeight: 800, color: '#0F172A', marginBottom: 12, letterSpacing: '-0.01em' }}>
+            Работает там, где удобно клиенту
+          </h2>
+          <p style={{ color: '#475569', fontSize: 16, maxWidth: 520, margin: '0 auto' }}>
+            Один AI-ассистент — три канала. Подключите нужные или все сразу.
+          </p>
+        </div>
+        <div className="landing-channels-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+          {CHANNELS.map((ch) => (
+            <div key={ch.title} className="card" style={{ padding: 28, borderRadius: 16, background: '#ffffff', border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', position: 'relative' }}>
+              {ch.isNew && (
+                <div style={{ position: 'absolute', top: 16, right: 16, padding: '2px 10px', borderRadius: 20, background: '#FFF7ED', color: '#C2410C', fontSize: 11, fontWeight: 700, border: '1px solid #FED7AA' }}>
+                  НОВОЕ
+                </div>
+              )}
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: ch.tagColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 16 }}>
+                {ch.icon}
+              </div>
+              <div style={{ fontWeight: 700, fontSize: 17, color: '#0F172A', marginBottom: 8 }}>{ch.title}</div>
+              <div style={{ fontSize: 14, color: '#475569', lineHeight: 1.6, marginBottom: 16 }}>{ch.desc}</div>
+              <div style={{ display: 'inline-block', padding: '4px 12px', borderRadius: 20, background: ch.tagColor, color: ch.tagText, fontSize: 12, fontWeight: 600 }}>
+                {ch.tag}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Features */}
       <section id="features" style={{ padding: '80px 20px', maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 60 }}>
@@ -147,7 +208,7 @@ export default function LandingApp() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
             {[
               { n: 1, title: 'Регистрация', desc: 'Создаёте аккаунт и указываете данные клиники. Получаете 7 дней бесплатного доступа.' },
-              { n: 2, title: 'Настройка', desc: 'Загружаете логотип, выбираете цвета, настраиваете промпт и Telegram-уведомления.' },
+              { n: 2, title: 'Настройка', desc: 'Загружаете логотип, выбираете цвета, настраиваете промпт. Подключаете уведомления в Telegram и/или Max.' },
               { n: 3, title: 'Установка виджета', desc: 'Копируете одну строку кода и вставляете на свой сайт. Интеграция готова!' },
               { n: 4, title: 'Работает 24/7', desc: 'AI-бот принимает обращения, оценивает срочность, собирает анамнез и записывает на приём.' },
             ].map((step, index, arr) => (
