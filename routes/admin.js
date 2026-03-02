@@ -176,27 +176,61 @@ router.put('/clinics/:id', async (req, res) => {
  */
 router.get('/stats', async (_req, res) => {
   try {
-    const { count: totalClinics } = await supabaseAdmin
-      .from('clinics')
-      .select('*', { count: 'exact', head: true });
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+    const weekAgo = new Date(now - 7 * 86400000).toISOString();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
 
-    const { count: activeClinics } = await supabaseAdmin
-      .from('clinics')
-      .select('*', { count: 'exact', head: true })
-      .eq('is_active', true);
+    // Run all queries in parallel
+    const [
+      { count: totalClinics },
+      { count: activeClinics },
+      { count: totalConversations },
+      { count: totalAppointments },
+      { count: newToday },
+      { count: newWeek },
+      { data: planData },
+      { data: usageData },
+      { data: paymentsData },
+      { data: paymentsMonth },
+    ] = await Promise.all([
+      supabaseAdmin.from('clinics').select('*', { count: 'exact', head: true }),
+      supabaseAdmin.from('clinics').select('*', { count: 'exact', head: true }).eq('is_active', true),
+      supabaseAdmin.from('conversations').select('*', { count: 'exact', head: true }),
+      supabaseAdmin.from('appointments').select('*', { count: 'exact', head: true }),
+      supabaseAdmin.from('clinics').select('*', { count: 'exact', head: true }).gte('created_at', todayStart),
+      supabaseAdmin.from('clinics').select('*', { count: 'exact', head: true }).gte('created_at', weekAgo),
+      supabaseAdmin.from('clinics').select('plan_id'),
+      supabaseAdmin.from('api_usage').select('tokens_input, tokens_output, cost_rub'),
+      supabaseAdmin.from('payments').select('amount_rub').eq('status', 'succeeded'),
+      supabaseAdmin.from('payments').select('amount_rub').eq('status', 'succeeded').gte('created_at', monthStart),
+    ]);
 
-    const { count: totalConversations } = await supabaseAdmin
-      .from('conversations')
-      .select('*', { count: 'exact', head: true });
+    // Calculate totals
+    const totalTokens = (usageData || []).reduce((s, r) => s + (r.tokens_input || 0) + (r.tokens_output || 0), 0);
+    const totalCosts = (usageData || []).reduce((s, r) => s + (Number(r.cost_rub) || 0), 0);
+    const totalRevenue = (paymentsData || []).reduce((s, r) => s + (Number(r.amount_rub) || 0), 0);
+    const revenueMonth = (paymentsMonth || []).reduce((s, r) => s + (Number(r.amount_rub) || 0), 0);
 
-    const { count: totalAppointments } = await supabaseAdmin
-      .from('appointments')
-      .select('*', { count: 'exact', head: true });
+    // Plan distribution
+    const planDistribution = {};
+    for (const row of (planData || [])) {
+      const p = row.plan_id || 'unknown';
+      planDistribution[p] = (planDistribution[p] || 0) + 1;
+    }
 
     res.json({
       clinics: { total: totalClinics, active: activeClinics },
       conversations: totalConversations,
       appointments: totalAppointments,
+      new_clinics_today: newToday || 0,
+      new_clinics_week: newWeek || 0,
+      total_tokens: totalTokens,
+      total_costs: Math.round(totalCosts * 100) / 100,
+      total_revenue: Math.round(totalRevenue * 100) / 100,
+      revenue_month: Math.round(revenueMonth * 100) / 100,
+      mrr: Math.round(revenueMonth * 100) / 100,
+      plan_distribution: planDistribution,
     });
   } catch (err) {
     logger.error({ error: err.message }, 'Admin stats error');

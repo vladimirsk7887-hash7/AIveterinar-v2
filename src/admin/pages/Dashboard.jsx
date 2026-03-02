@@ -73,12 +73,6 @@ export default function Dashboard() {
           <div className="stat-value">{analytics?.conversionRate ?? 0}%</div>
           <div className="stat-label">Конверсия</div>
         </div>
-        <div className="stat-card">
-          <div className="stat-value" style={{ fontSize: 20 }}>
-            {analytics?.usage ? `${Math.round((analytics.usage.tokens_input + analytics.usage.tokens_output) / 1000)}K` : '—'}
-          </div>
-          <div className="stat-label">Токенов использовано</div>
-        </div>
       </div>
 
       {analytics?.statusBreakdown && Object.keys(analytics.statusBreakdown).length > 0 && (

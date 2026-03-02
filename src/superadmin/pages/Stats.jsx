@@ -1,6 +1,13 @@
 import { useState, useEffect } from 'react';
 import { saApi } from '../lib/api.js';
 
+const PLAN_NAMES = { trial: 'Пробный', start: 'Старт', business: 'Бизнес', pro: 'Про' };
+
+function fmt(n) {
+  if (n == null) return '—';
+  return Number(n).toLocaleString('ru-RU');
+}
+
 export default function Stats({ token }) {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -19,60 +26,78 @@ export default function Stats({ token }) {
     <div>
       <div className="page-title"><span className="icon">📊</span> Статистика платформы</div>
 
+      {/* Top row: main KPIs */}
       <div className="stat-grid">
         <div className="stat-card">
-          <div className="stat-value">{stats.total_clinics ?? 0}</div>
-          <div className="stat-label">Клиник всего</div>
+          <div className="stat-icon">🏥</div>
+          <div className="stat-value">{fmt(stats.clinics?.total)}</div>
+          <div className="stat-label">Всего клиник</div>
         </div>
         <div className="stat-card">
-          <div className="stat-value">{stats.active_clinics ?? 0}</div>
-          <div className="stat-label">Активных</div>
+          <div className="stat-icon">🆕</div>
+          <div className="stat-value">{fmt(stats.new_clinics_today)}</div>
+          <div className="stat-label">Новых сегодня</div>
         </div>
         <div className="stat-card">
-          <div className="stat-value">{stats.total_conversations ?? 0}</div>
-          <div className="stat-label">Диалогов</div>
+          <div className="stat-icon" style={{ color: '#00E676' }}>₽</div>
+          <div className="stat-value" style={{ color: '#00E676' }}>{fmt(stats.total_revenue)}</div>
+          <div className="stat-label">Общий доход</div>
         </div>
         <div className="stat-card">
-          <div className="stat-value">{stats.total_appointments ?? 0}</div>
-          <div className="stat-label">Записей</div>
+          <div className="stat-icon" style={{ color: '#FF5252' }}>₽</div>
+          <div className="stat-value" style={{ color: '#FF5252' }}>{fmt(stats.total_costs)}</div>
+          <div className="stat-label">Затраты AI</div>
         </div>
       </div>
 
-      <div className="stat-grid">
-        <div className="stat-card">
-          <div className="stat-value" style={{ fontSize: 20 }}>
-            {stats.total_tokens ? `${Math.round(stats.total_tokens / 1000)}K` : '—'}
+      {/* Stats for period */}
+      <div style={{ display: 'flex', gap: 16, marginBottom: 24, flexWrap: 'wrap' }}>
+        <div className="card" style={{ flex: '1 1 55%', minWidth: 280 }}>
+          <div className="card-title">Статистика за период</div>
+          <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', justifyContent: 'space-around', padding: '12px 0' }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 28, fontWeight: 800, color: '#448AFF' }}>{fmt(stats.new_clinics_week)}</div>
+              <div style={{ fontSize: 12, color: '#546E7A', marginTop: 4 }}>Новых за неделю</div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 28, fontWeight: 800, color: '#00E676' }}>{fmt(stats.revenue_month)} ₽</div>
+              <div style={{ fontSize: 12, color: '#546E7A', marginTop: 4 }}>Доход за месяц</div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 28, fontWeight: 800, color: '#7C4DFF' }}>{fmt(stats.conversations)}</div>
+              <div style={{ fontSize: 12, color: '#546E7A', marginTop: 4 }}>Всего диалогов</div>
+            </div>
           </div>
-          <div className="stat-label">Токенов всего</div>
         </div>
-        <div className="stat-card">
-          <div className="stat-value" style={{ fontSize: 20 }}>
-            {stats.total_revenue ? `${stats.total_revenue} ₽` : '—'}
+
+        <div className="card" style={{ flex: '1 1 35%', minWidth: 220 }}>
+          <div className="card-title">Ключевые метрики</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '8px 0' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: '#90A4AE', fontSize: 13 }}>Активных клиник</span>
+              <span style={{ fontWeight: 700 }}>{fmt(stats.clinics?.active)}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: '#90A4AE', fontSize: 13 }}>Записей на приём</span>
+              <span style={{ fontWeight: 700 }}>{fmt(stats.appointments)}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: '#90A4AE', fontSize: 13 }}>MRR</span>
+              <span style={{ fontWeight: 700, color: '#00E676' }}>{fmt(stats.mrr)} ₽</span>
+            </div>
           </div>
-          <div className="stat-label">Выручка</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-value" style={{ fontSize: 20 }}>
-            {stats.total_costs ? `${stats.total_costs} ₽` : '—'}
-          </div>
-          <div className="stat-label">Расходы на AI</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-value" style={{ fontSize: 20 }}>
-            {stats.mrr ? `${stats.mrr} ₽` : '—'}
-          </div>
-          <div className="stat-label">MRR</div>
         </div>
       </div>
 
-      {stats.plan_distribution && (
+      {/* Plan distribution */}
+      {stats.plan_distribution && Object.keys(stats.plan_distribution).length > 0 && (
         <div className="card">
           <div className="card-title">Распределение по тарифам</div>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             {Object.entries(stats.plan_distribution).map(([plan, count]) => (
-              <div key={plan} style={{ padding: '12px 20px', borderRadius: 12, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', textAlign: 'center' }}>
-                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 20, fontWeight: 800 }}>{count}</div>
-                <div style={{ fontSize: 11, color: '#546E7A', textTransform: 'uppercase', marginTop: 4 }}>{plan}</div>
+              <div key={plan} style={{ padding: '14px 24px', borderRadius: 12, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', textAlign: 'center', minWidth: 80 }}>
+                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 22, fontWeight: 800 }}>{count}</div>
+                <div style={{ fontSize: 11, color: '#546E7A', textTransform: 'uppercase', marginTop: 4 }}>{PLAN_NAMES[plan] || plan}</div>
               </div>
             ))}
           </div>
