@@ -42,8 +42,8 @@ export default function Settings() {
     <div>
       <div className="page-title"><span className="icon">⚙️</span> Настройки</div>
 
-      <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
-        {[['profile', 'Профиль'], ['branding', 'Брендинг'], ['telegram', 'Telegram']].map(([key, label]) => (
+      <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
+        {[['profile', 'Профиль'], ['branding', 'Брендинг'], ['telegram', 'Telegram'], ['max', 'Max']].map(([key, label]) => (
           <button
             key={key}
             className={`btn ${tab === key ? 'btn-primary' : 'btn-outline'}`}
@@ -63,6 +63,7 @@ export default function Settings() {
       {tab === 'profile' && <ProfileTab clinic={clinic} setClinic={setClinic} onSave={save} saving={saving} />}
       {tab === 'branding' && <BrandingTab clinic={clinic} setClinic={setClinic} onSave={save} saving={saving} />}
       {tab === 'telegram' && <TelegramTab clinic={clinic} setClinic={setClinic} onSave={save} saving={saving} />}
+      {tab === 'max' && <MaxTab clinic={clinic} />}
     </div>
   );
 }
@@ -184,6 +185,53 @@ function BrandingTab({ clinic, setClinic, onSave, saving }) {
       <button className="btn btn-primary" onClick={() => onSave(clinic.settings?.branding || {}, 'branding')} disabled={saving}>
         {saving ? 'Сохранение...' : 'Сохранить брендинг'}
       </button>
+    </div>
+  );
+}
+
+function MaxTab({ clinic }) {
+  const [copied, setCopied] = useState(false);
+  const url = `https://vetai24.ru/max/${clinic.slug || ''}`;
+
+  const copy = () => {
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  return (
+    <div className="card">
+      <div className="card-title">Max — мессенджер</div>
+      <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(0,230,118,0.07)', border: '1px solid rgba(0,230,118,0.2)', fontSize: 12, color: '#69F0AE', marginBottom: 20 }}>
+        Max Mini-App подключается без токенов — достаточно указать ссылку ниже при настройке бота.
+        Уведомления о записях отправляются через Telegram-интеграцию (вкладка Telegram).
+      </div>
+      <div className="form-group">
+        <label className="label">URL мини-аппа</label>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <input
+            className="input"
+            value={url}
+            readOnly
+            style={{ flex: 1, fontFamily: "'JetBrains Mono', monospace", fontSize: 12 }}
+          />
+          <button className="btn btn-outline" onClick={copy} style={{ whiteSpace: 'nowrap' }}>
+            {copied ? '✓ Скопировано' : 'Копировать'}
+          </button>
+        </div>
+        <div style={{ fontSize: 11, color: '#546E7A', marginTop: 6 }}>
+          Укажите эту ссылку в настройках вашего бота в мессенджере Max в поле «Web App URL».
+        </div>
+      </div>
+      <div style={{ marginTop: 8, padding: '12px 16px', borderRadius: 10, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', fontSize: 12 }}>
+        <div style={{ fontWeight: 700, marginBottom: 8, fontSize: 13 }}>Как подключить</div>
+        <ol style={{ margin: 0, paddingLeft: 18, lineHeight: 1.9, color: '#90A4AE' }}>
+          <li>Зайдите в настройки вашего бота в Max</li>
+          <li>В поле <b style={{ color: '#CFD8DC' }}>Web App URL</b> вставьте ссылку выше</li>
+          <li>Сохраните — кнопка запуска мини-аппа появится в чате бота</li>
+        </ol>
+      </div>
     </div>
   );
 }
