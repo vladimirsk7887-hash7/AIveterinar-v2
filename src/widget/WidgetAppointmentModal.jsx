@@ -79,6 +79,7 @@ export default function WidgetAppointmentModal({ pet, messages, onClose }) {
       contactValue,
       petCard: card,
       petId: pet?.id,
+      status: pet?.status,
     });
     if (sent) {
       setStep("success");

@@ -76,7 +76,7 @@ export async function callAI(messages, _systemOverride, petId) {
 /**
  * Send appointment through widget API (replaces sendToTelegram).
  */
-export async function sendToTelegram(text, { ownerName, contactMethod, contactValue, petCard, petId } = {}) {
+export async function sendToTelegram(text, { ownerName, contactMethod, contactValue, petCard, petId, status } = {}) {
   try {
     const response = await fetch(`${API}/appointment`, {
       method: 'POST',
@@ -88,6 +88,7 @@ export async function sendToTelegram(text, { ownerName, contactMethod, contactVa
         contactValue: contactValue || 'Не указано',
         petCard: petCard || null,
         summary: text,
+        status: status || 'consultation',
         source: 'widget',
       }),
     });

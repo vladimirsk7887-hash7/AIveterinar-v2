@@ -49,20 +49,25 @@ export function setupEventListeners(config) {
 
   // Send appointment notifications via Telegram and Max
   eventBus.on('appointment.created', async (data) => {
-    const { owner_name, contact_method, contact_value, pet_card, summary, tg_chat_ids, tg_bot_token_encrypted, max_bot_token_encrypted, max_chat_id } = data;
+    const { owner_name, contact_method, contact_value, pet_card, summary, status, tg_chat_ids, tg_bot_token_encrypted, max_bot_token_encrypted, max_chat_id } = data;
 
     logger.info({
       hasTgChatIds: !!(tg_chat_ids?.length),
       tgCount: tg_chat_ids?.length || 0,
       hasMaxToken: !!max_bot_token_encrypted,
       hasMaxChatId: !!max_chat_id,
-      maxChatId: max_chat_id || null,
     }, 'appointment.created — notification check');
 
     // Format contact method label
     const contactLabel = contact_method === 'telegram' ? 'Telegram'
       : contact_method === 'max' ? 'Max'
         : contact_method === 'phone' ? 'Телефон' : contact_method;
+
+    // Status emoji
+    const statusLabel = {
+      red: '🔴 ЭКСТРЕННО', yellow: '🟡 Требует внимания',
+      green: '🟢 Стабильное', consultation: '🔵 Консультация',
+    }[status] || '🔵 Консультация';
 
     // Build patient card block
     const card = pet_card || {};
@@ -76,19 +81,29 @@ export function setupEventListeners(config) {
       card.notes && `Заметки: ${card.notes}`,
     ].filter(Boolean).join('\n');
 
+    const divider = '─────────────────';
+
     const text = [
-      '🏥 **НОВАЯ ЗАПИСЬ НА ПРИЁМ**',
+      '🏥 НОВАЯ ЗАПИСЬ НА ПРИЁМ',
       '',
-      `👤 **Владелец:** ${owner_name}`,
-      `📱 **${contactLabel}:** ${contact_value}`,
-      cardLines ? `\n🐾 **Пациент:**\n${cardLines}` : '',
-      summary ? `\n📋 **Саммари:**\n${summary}` : '',
-      '\n🕐 _Отправлено через AI-Ветеринар_',
-    ].filter(v => v !== '').join('\n');
+      `👤 Владелец: ${owner_name}`,
+      `📱 Связь (${contactLabel}): ${contact_value}`,
+      `⚡ Статус: ${statusLabel}`,
+      '',
+      divider,
+      `🐾 КАРТОЧКА ПАЦИЕНТА`,
+      cardLines || 'Нет данных',
+      '',
+      divider,
+      summary || 'Саммари недоступно',
+      '',
+      divider,
+      '🕐 Отправлено через AI-Ветеринар',
+    ].join('\n');
 
     // Telegram notification — use clinic's own bot token if available
     if (tg_chat_ids?.length) {
-      const plainText = text.replace(/\*\*/g, '').replace(/_/g, '');
+      const plainText = text;
       if (tg_bot_token_encrypted) {
         try {
           const tgToken = decrypt(tg_bot_token_encrypted);

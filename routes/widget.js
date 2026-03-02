@@ -235,7 +235,7 @@ router.post('/:slug/chat', async (req, res) => {
  * Create an appointment and notify clinic via TG.
  */
 router.post('/:slug/appointment', async (req, res) => {
-  const { conversationId, ownerName, contactMethod, contactValue, petCard, summary, source } = req.body;
+  const { conversationId, ownerName, contactMethod, contactValue, petCard, summary, status, source } = req.body;
 
   if (!ownerName || !contactMethod || !contactValue) {
     return res.status(400).json({ error: 'Missing required fields' });
@@ -278,6 +278,7 @@ router.post('/:slug/appointment', async (req, res) => {
       max_bot_token_encrypted: clinic.max_bot_token_encrypted || null,
       max_chat_id: clinic.max_chat_id || null,
       summary,
+      status: status || 'consultation',
     });
 
     res.json({ success: true, appointmentId: appointment.id });
