@@ -86,11 +86,19 @@ router.post('/logo', upload.single('logo'), async (req, res) => {
   res.json({ url: publicUrl });
 });
 
+function maskToken(token) {
+  if (!token || token.length < 8) return '****';
+  return `${token.slice(0, 4)}...${token.slice(-4)}`;
+}
+
 /** PUT /api/clinic/telegram — save Telegram bot token (encrypted) and chat ID */
 router.put('/telegram', async (req, res) => {
   const { tg_bot_token, tg_chat_id } = req.body;
   const updates = { updated_at: new Date().toISOString() };
-  if (tg_bot_token?.trim()) updates.tg_bot_token_encrypted = encrypt(tg_bot_token.trim());
+  if (tg_bot_token?.trim()) {
+    updates.tg_bot_token_encrypted = encrypt(tg_bot_token.trim());
+    updates.settings = { ...(req.clinic.settings || {}), tg_token_hint: maskToken(tg_bot_token.trim()) };
+  }
   if (tg_chat_id?.trim()) updates.tg_chat_ids = [tg_chat_id.trim()];
   if (Object.keys(updates).length === 1) return res.status(400).json({ error: 'Nothing to update' });
   const { error } = await supabaseAdmin.from('clinics').update(updates).eq('id', req.clinic.id);
@@ -102,7 +110,10 @@ router.put('/telegram', async (req, res) => {
 router.put('/max', async (req, res) => {
   const { max_bot_token, max_chat_id } = req.body;
   const updates = { updated_at: new Date().toISOString() };
-  if (max_bot_token?.trim()) updates.max_bot_token_encrypted = encrypt(max_bot_token.trim());
+  if (max_bot_token?.trim()) {
+    updates.max_bot_token_encrypted = encrypt(max_bot_token.trim());
+    updates.settings = { ...(req.clinic.settings || {}), max_token_hint: maskToken(max_bot_token.trim()) };
+  }
   if (max_chat_id?.trim()) updates.max_chat_id = max_chat_id.trim();
   if (Object.keys(updates).length === 1) return res.status(400).json({ error: 'Nothing to update' });
   const { error } = await supabaseAdmin.from('clinics').update(updates).eq('id', req.clinic.id);

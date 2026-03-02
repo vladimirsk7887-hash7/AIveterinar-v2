@@ -250,8 +250,8 @@ function MaxTab({ clinic, setClinic, onSave, saving }) {
           placeholder="Вставьте токен бота из Max Developer Portal"
           type="password"
         />
-        <div style={{ fontSize: 11, color: '#546E7A', marginTop: 4 }}>
-          {clinic.max_bot_token_encrypted ? '✓ Токен сохранён (введите новый для замены)' : 'Токен не настроен'}
+        <div style={{ fontSize: 11, color: '#546E7A', marginTop: 4, fontFamily: "'JetBrains Mono', monospace" }}>
+          {clinic.settings?.max_token_hint ? `✓ ${clinic.settings.max_token_hint} (введите новый для замены)` : clinic.max_bot_token_encrypted ? '✓ Токен сохранён' : 'Токен не настроен'}
         </div>
       </div>
       <div className="form-group">
@@ -296,8 +296,8 @@ function TelegramTab({ clinic, setClinic, onSave, saving }) {
       <div className="form-group">
         <label className="label">Bot Token</label>
         <input className="input" value={tgToken} onChange={(e) => setTgToken(e.target.value)} placeholder="123456:ABC-DEF..." type="password" />
-        <div style={{ fontSize: 11, color: '#546E7A', marginTop: 4 }}>
-          {clinic.tg_bot_token_encrypted ? '✓ Токен сохранён (введите новый для замены)' : 'Токен не настроен'}
+        <div style={{ fontSize: 11, color: '#546E7A', marginTop: 4, fontFamily: "'JetBrains Mono', monospace" }}>
+          {clinic.settings?.tg_token_hint ? `✓ ${clinic.settings.tg_token_hint} (введите новый для замены)` : clinic.tg_bot_token_encrypted ? '✓ Токен сохранён' : 'Токен не настроен'}
         </div>
       </div>
       <div className="form-group">
