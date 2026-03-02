@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 const PLANS = [
   {
     name: 'Start',
@@ -71,6 +73,92 @@ const FEATURES = [
   { icon: '🔒', title: 'Безопасность', desc: 'Изоляция данных каждой клиники. Шифрование токенов. HTTPS everywhere.' },
 ];
 
+function RoiCalculator() {
+  const [visits, setVisits] = useState(15);
+  const [missed, setMissed] = useState(30);
+  const [ticket, setTicket] = useState(2500);
+
+  const lostPerMonth = Math.round(visits * 30 * (missed / 100) * ticket);
+  const fmt = (n) => n.toLocaleString('ru-RU');
+
+  const sliders = [
+    { label: 'Обращений в день', value: visits, min: 5, max: 100, step: 5, set: setVisits, fmt: (v) => v },
+    { label: 'Необработанных / Ночных (%)', value: missed, min: 5, max: 70, step: 5, set: setMissed, fmt: (v) => `${v}%` },
+    { label: 'Средний чек (₽)', value: ticket, min: 500, max: 10000, step: 500, set: setTicket, fmt: (v) => `${fmt(v)} ₽` },
+  ];
+
+  return (
+    <section id="calculator" style={{ padding: '80px 20px', background: '#0F172A' }}>
+      <style>{`
+        .roi-range { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; border-radius: 4px; background: rgba(255,255,255,0.12); outline: none; cursor: pointer; }
+        .roi-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #10B981; cursor: pointer; box-shadow: 0 0 0 4px rgba(16,185,129,0.2); transition: box-shadow 0.2s; }
+        .roi-range::-webkit-slider-thumb:hover { box-shadow: 0 0 0 6px rgba(16,185,129,0.3); }
+        .roi-range::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #10B981; cursor: pointer; border: none; }
+        @media (max-width: 768px) { .roi-inner { flex-direction: column !important; } }
+      `}</style>
+      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: 48 }}>
+          <h2 style={{ fontSize: 'clamp(26px, 4vw, 36px)', fontWeight: 800, color: '#fff', marginBottom: 12, letterSpacing: '-0.01em' }}>
+            Сколько вы теряете сейчас?
+          </h2>
+          <p style={{ color: '#94A3B8', fontSize: 16, maxWidth: 520, margin: '0 auto' }}>
+            Двигайте ползунки, чтобы рассчитать упущенную выгоду от необработанных ночных заявок и загруженных линий.
+          </p>
+        </div>
+        <div className="roi-inner" style={{ display: 'flex', gap: 24, alignItems: 'stretch' }}>
+          {/* Sliders */}
+          <div style={{ flex: '0 0 55%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 20, padding: '36px 40px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+              {sliders.map((s) => (
+                <div key={s.label}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+                    <span style={{ fontSize: 15, color: '#CBD5E1', fontWeight: 500 }}>{s.label}</span>
+                    <span style={{ fontSize: 16, fontWeight: 700, color: '#10B981', background: 'rgba(16,185,129,0.12)', padding: '3px 12px', borderRadius: 8 }}>{s.fmt(s.value)}</span>
+                  </div>
+                  <input
+                    className="roi-range"
+                    type="range"
+                    min={s.min} max={s.max} step={s.step}
+                    value={s.value}
+                    onChange={(e) => s.set(Number(e.target.value))}
+                  />
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: 36, paddingTop: 28, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+              <div style={{ fontSize: 14, color: '#64748B', marginBottom: 8 }}>Потенциальные потери в месяц:</div>
+              <div style={{ fontSize: 'clamp(36px, 5vw, 52px)', fontWeight: 800, color: '#EF4444', letterSpacing: '-0.02em', lineHeight: 1 }}>
+                {fmt(lostPerMonth)} ₽
+              </div>
+            </div>
+          </div>
+
+          {/* Info cards */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <div style={{ flex: 1, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '28px 32px' }}>
+              <div style={{ fontSize: 22, marginBottom: 12 }}>💰</div>
+              <div style={{ fontWeight: 700, fontSize: 17, color: '#10B981', marginBottom: 10 }}>Экономия на ФОТ</div>
+              <div style={{ fontSize: 14, color: '#94A3B8', lineHeight: 1.7 }}>
+                Ночной администратор стоит от 40 000 ₽. AI-ветеринар работает 24/7 за долю этой суммы.
+              </div>
+            </div>
+            <div style={{ flex: 1, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '28px 32px' }}>
+              <div style={{ fontSize: 22, marginBottom: 12 }}>📈</div>
+              <div style={{ fontWeight: 700, fontSize: 17, color: '#3B82F6', marginBottom: 10 }}>Рост конверсии</div>
+              <div style={{ fontSize: 14, color: '#94A3B8', lineHeight: 1.7 }}>
+                Мгновенный ответ повышает вероятность записи на 35%. Клиент не успевает уйти к конкуренту.
+              </div>
+            </div>
+            <a href="/admin" style={{ display: 'block', textAlign: 'center', padding: '16px 24px', borderRadius: 12, background: '#F97316', color: '#fff', fontWeight: 700, fontSize: 15, boxShadow: '0 8px 20px -6px rgba(249,115,22,0.4)' }}>
+              Устранить потери →
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function LandingApp() {
   return (
     <div style={{ background: '#F8FAFC', color: '#1E293B', fontFamily: "'Figtree', 'Noto Sans', sans-serif", minHeight: '100vh' }}>
@@ -111,6 +199,7 @@ export default function LandingApp() {
         <div className="landing-nav-links" style={{ display: 'flex', gap: 32, alignItems: 'center' }}>
           <a href="#features" style={{ fontSize: 15, fontWeight: 500, color: '#475569' }}>Возможности</a>
           <a href="#channels" style={{ fontSize: 15, fontWeight: 500, color: '#475569' }}>Каналы</a>
+          <a href="#calculator" style={{ fontSize: 15, fontWeight: 500, color: '#475569' }}>Калькулятор</a>
           <a href="#pricing" style={{ fontSize: 15, fontWeight: 500, color: '#475569' }}>Тарифы</a>
           <a href="/admin" style={{ padding: '10px 24px', borderRadius: 8, background: '#3B82F6', color: '#fff', fontWeight: 600, fontSize: 14 }}>
             Войти
@@ -233,6 +322,9 @@ export default function LandingApp() {
           </div>
         </div>
       </section>
+
+      {/* ROI Calculator */}
+      <RoiCalculator />
 
       {/* Pricing */}
       <section id="pricing" style={{ padding: '80px 20px', maxWidth: 1100, margin: '0 auto' }}>
