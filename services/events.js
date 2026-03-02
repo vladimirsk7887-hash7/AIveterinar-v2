@@ -49,7 +49,7 @@ export function setupEventListeners(config) {
 
   // Send appointment notifications via Telegram and Max
   eventBus.on('appointment.created', async (data) => {
-    const { owner_name, contact_method, contact_value, pet_card, summary, tg_chat_ids, max_bot_token_encrypted, max_chat_id } = data;
+    const { owner_name, contact_method, contact_value, pet_card, summary, tg_chat_ids, tg_bot_token_encrypted, max_bot_token_encrypted, max_chat_id } = data;
 
     logger.info({
       hasTgChatIds: !!(tg_chat_ids?.length),
@@ -86,11 +86,27 @@ export function setupEventListeners(config) {
       '\n🕐 _Отправлено через AI-Ветеринар_',
     ].filter(v => v !== '').join('\n');
 
-    // Telegram notification
+    // Telegram notification — use clinic's own bot token if available
     if (tg_chat_ids?.length) {
-      notifyClinicChats(tg_chat_ids, text.replace(/\*\*/g, '')).catch((err) => {
-        logger.error({ error: err.message }, 'TG notify failed');
-      });
+      const plainText = text.replace(/\*\*/g, '').replace(/_/g, '');
+      if (tg_bot_token_encrypted) {
+        try {
+          const tgToken = decrypt(tg_bot_token_encrypted);
+          Promise.allSettled(
+            tg_chat_ids.map((chatId) =>
+              import('./telegram.js').then(({ sendTelegramMessage }) =>
+                sendTelegramMessage(tgToken, chatId, plainText)
+              )
+            )
+          ).catch(() => {});
+        } catch (err) {
+          logger.error({ error: err.message }, 'TG token decrypt failed');
+        }
+      } else {
+        notifyClinicChats(tg_chat_ids, plainText).catch((err) => {
+          logger.error({ error: err.message }, 'TG notify failed');
+        });
+      }
     }
 
     // Max notification

@@ -284,7 +284,8 @@ function MaxTab({ clinic, setClinic, onSave, saving }) {
 }
 
 function TelegramTab({ clinic, setClinic, onSave, saving }) {
-  const update = (field) => (e) => setClinic({ ...clinic, [field]: e.target.value });
+  const [tgToken, setTgToken] = useState('');
+  const chatId = clinic.tg_chat_ids?.[0] || '';
 
   return (
     <div className="card">
@@ -294,13 +295,24 @@ function TelegramTab({ clinic, setClinic, onSave, saving }) {
       </div>
       <div className="form-group">
         <label className="label">Bot Token</label>
-        <input className="input" value={clinic.tg_bot_token || ''} onChange={update('tg_bot_token')} placeholder="123456:ABC-DEF..." type="password" />
+        <input className="input" value={tgToken} onChange={(e) => setTgToken(e.target.value)} placeholder="123456:ABC-DEF..." type="password" />
+        <div style={{ fontSize: 11, color: '#546E7A', marginTop: 4 }}>
+          {clinic.tg_bot_token_encrypted ? '✓ Токен сохранён (введите новый для замены)' : 'Токен не настроен'}
+        </div>
       </div>
       <div className="form-group">
         <label className="label">Chat ID</label>
-        <input className="input" value={clinic.tg_chat_id || ''} onChange={update('tg_chat_id')} placeholder="-1001234567890" />
+        <input className="input" value={chatId} onChange={(e) => setClinic({ ...clinic, tg_chat_ids: e.target.value ? [e.target.value] : [] })} placeholder="-1001234567890" />
       </div>
-      <button className="btn btn-primary" onClick={() => onSave({ tg_bot_token: clinic.tg_bot_token, tg_chat_id: clinic.tg_chat_id }, 'telegram')} disabled={saving}>
+      <button className="btn btn-primary"
+        onClick={() => {
+          const data = {};
+          if (tgToken.trim()) data.tg_bot_token = tgToken.trim();
+          if (chatId.trim()) data.tg_chat_id = chatId.trim();
+          onSave(data, 'telegram');
+          if (tgToken) setTgToken('');
+        }}
+        disabled={saving}>
         {saving ? 'Сохранение...' : 'Сохранить Telegram'}
       </button>
     </div>
