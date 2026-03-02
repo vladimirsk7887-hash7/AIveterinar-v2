@@ -271,8 +271,8 @@ function MaxTab({ clinic, setClinic, onSave, saving }) {
         <div style={{ fontWeight: 700, marginBottom: 6, fontSize: 13 }}>Как получить Chat ID</div>
         <ol style={{ margin: 0, paddingLeft: 18, lineHeight: 1.9, color: '#90A4AE' }}>
           <li>Добавьте бота администратором в канал/группу</li>
-          <li>Откройте: <span style={{ fontFamily: 'monospace', color: '#CFD8DC' }}>https://platform-api.max.ru/chats</span> с токеном бота в заголовке Authorization</li>
-          <li>Скопируйте поле <b style={{ color: '#CFD8DC' }}>chat_id</b> нужного чата</li>
+          <li>Перешлите любое сообщение из канала боту <a href="https://max.ru/id222312277810_1_bot" target="_blank" rel="noopener" style={{ color: '#69F0AE' }}>@CHECK ID</a></li>
+          <li>Бот ответит числовым <b style={{ color: '#CFD8DC' }}>chat_id</b> — скопируйте его сюда</li>
         </ol>
       </div>
 
