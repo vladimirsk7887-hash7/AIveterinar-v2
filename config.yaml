@@ -9,7 +9,7 @@ platform:
 
 # ─── AI ПРОВАЙДЕРЫ ───────────────────────────────────────
 ai:
-  default_provider: "openrouter"
+  default_provider: "routerai"
   default_model: "deepseek/deepseek-chat-v3-0324"
   max_completion_tokens: 1000
 
