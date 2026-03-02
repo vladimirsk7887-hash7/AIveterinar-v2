@@ -95,25 +95,30 @@ function RoiCalculator() {
         .roi-range::-webkit-slider-thumb:hover { box-shadow: 0 0 0 6px rgba(16,185,129,0.3); }
         .roi-range::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #10B981; cursor: pointer; border: none; }
         @media (max-width: 768px) { .roi-inner { flex-direction: column !important; } }
+        @media (max-width: 640px) {
+          .roi-sliders { padding: 24px 20px !important; }
+          .roi-info-card { padding: 20px !important; }
+          .roi-slider-row { flex-wrap: wrap !important; gap: 6px !important; }
+        }
       `}</style>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <h2 style={{ fontSize: 'clamp(26px, 4vw, 36px)', fontWeight: 800, color: '#fff', marginBottom: 12, letterSpacing: '-0.01em' }}>
+          <h2 style={{ fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 800, color: '#fff', marginBottom: 12, letterSpacing: '-0.01em' }}>
             Сколько вы теряете сейчас?
           </h2>
-          <p style={{ color: '#94A3B8', fontSize: 16, maxWidth: 520, margin: '0 auto' }}>
+          <p style={{ color: '#94A3B8', fontSize: 15, maxWidth: 520, margin: '0 auto' }}>
             Двигайте ползунки, чтобы рассчитать упущенную выгоду от необработанных ночных заявок и загруженных линий.
           </p>
         </div>
         <div className="roi-inner" style={{ display: 'flex', gap: 24, alignItems: 'stretch' }}>
           {/* Sliders */}
-          <div style={{ flex: '0 0 55%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 20, padding: '36px 40px' }}>
+          <div className="roi-sliders" style={{ flex: '0 0 55%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 20, padding: '36px 40px' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
               {sliders.map((s) => (
                 <div key={s.label}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-                    <span style={{ fontSize: 15, color: '#CBD5E1', fontWeight: 500 }}>{s.label}</span>
-                    <span style={{ fontSize: 16, fontWeight: 700, color: '#10B981', background: 'rgba(16,185,129,0.12)', padding: '3px 12px', borderRadius: 8 }}>{s.fmt(s.value)}</span>
+                  <div className="roi-slider-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+                    <span style={{ fontSize: 14, color: '#CBD5E1', fontWeight: 500 }}>{s.label}</span>
+                    <span style={{ fontSize: 15, fontWeight: 700, color: '#10B981', background: 'rgba(16,185,129,0.12)', padding: '3px 10px', borderRadius: 8, flexShrink: 0 }}>{s.fmt(s.value)}</span>
                   </div>
                   <input
                     className="roi-range"
@@ -127,7 +132,7 @@ function RoiCalculator() {
             </div>
             <div style={{ marginTop: 36, paddingTop: 28, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
               <div style={{ fontSize: 14, color: '#64748B', marginBottom: 8 }}>Потенциальные потери в месяц:</div>
-              <div style={{ fontSize: 'clamp(36px, 5vw, 52px)', fontWeight: 800, color: '#EF4444', letterSpacing: '-0.02em', lineHeight: 1 }}>
+              <div style={{ fontSize: 'clamp(32px, 5vw, 52px)', fontWeight: 800, color: '#EF4444', letterSpacing: '-0.02em', lineHeight: 1 }}>
                 {fmt(lostPerMonth)} ₽
               </div>
             </div>
@@ -135,14 +140,14 @@ function RoiCalculator() {
 
           {/* Info cards */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 20 }}>
-            <div style={{ flex: 1, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '28px 32px' }}>
+            <div className="roi-info-card" style={{ flex: 1, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '28px 32px' }}>
               <div style={{ fontSize: 22, marginBottom: 12 }}>💰</div>
               <div style={{ fontWeight: 700, fontSize: 17, color: '#10B981', marginBottom: 10 }}>Экономия на ФОТ</div>
               <div style={{ fontSize: 14, color: '#94A3B8', lineHeight: 1.7 }}>
                 Ночной администратор стоит от 40 000 ₽. AI-ветеринар работает 24/7 за долю этой суммы.
               </div>
             </div>
-            <div style={{ flex: 1, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '28px 32px' }}>
+            <div className="roi-info-card" style={{ flex: 1, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '28px 32px' }}>
               <div style={{ fontSize: 22, marginBottom: 12 }}>📈</div>
               <div style={{ fontWeight: 700, fontSize: 17, color: '#3B82F6', marginBottom: 10 }}>Рост конверсии</div>
               <div style={{ fontSize: 14, color: '#94A3B8', lineHeight: 1.7 }}>
@@ -161,7 +166,7 @@ function RoiCalculator() {
 
 export default function LandingApp() {
   return (
-    <div style={{ background: '#F8FAFC', color: '#1E293B', fontFamily: "'Figtree', 'Noto Sans', sans-serif", minHeight: '100vh' }}>
+    <div style={{ background: '#F8FAFC', color: '#1E293B', fontFamily: "'Figtree', 'Noto Sans', sans-serif", minHeight: '100vh', overflowX: 'hidden' }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800;900&family=Noto+Sans:wght@300;400;500;600;700&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -174,9 +179,10 @@ export default function LandingApp() {
         .pricing-btn-popular:hover { background: #2563EB !important; }
         .landing-pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
         @media (max-width: 640px) {
-          .landing-nav { padding: 16px 20px !important; flex-wrap: wrap; gap: 12px; }
-          .landing-nav-links { gap: 16px !important; width: 100%; justify-content: space-between; }
-          .landing-hero { padding: 48px 20px 40px !important; }
+          .landing-nav { padding: 14px 16px !important; flex-wrap: wrap; gap: 10px; }
+          .landing-nav-links { gap: 12px !important; width: 100%; justify-content: space-between; }
+          .nav-hide-mobile { display: none !important; }
+          .landing-hero { padding: 40px 16px 36px !important; }
           .landing-hero-desc { font-size: 17px !important; }
           .landing-hero-btns { flex-direction: column !important; align-items: stretch !important; }
           .landing-hero-btns a { text-align: center; }
@@ -184,9 +190,15 @@ export default function LandingApp() {
           .landing-channels-grid { grid-template-columns: 1fr !important; }
           .landing-pricing-grid { grid-template-columns: 1fr !important; }
           .landing-cta-box { padding: 40px 24px !important; }
-          .landing-cta-title { font-size: 26px !important; }
+          .landing-cta-title { font-size: 24px !important; }
           .landing-hero-trust { flex-direction: column; gap: 6px !important; align-items: center; }
           .landing-hero-trust span[style*="CBD5E1"] { display: none !important; }
+          .landing-section-h2 { font-size: 24px !important; }
+          .pricing-card { padding: 28px 20px !important; }
+          .landing-footer-inner { flex-direction: column !important; align-items: center !important; text-align: center !important; gap: 12px !important; }
+        }
+        @media (max-width: 420px) {
+          .landing-h1 { font-size: 32px !important; }
         }
       `}</style>
 
@@ -198,10 +210,10 @@ export default function LandingApp() {
         </div>
         <div className="landing-nav-links" style={{ display: 'flex', gap: 32, alignItems: 'center' }}>
           <a href="#features" style={{ fontSize: 15, fontWeight: 500, color: '#475569' }}>Возможности</a>
-          <a href="#channels" style={{ fontSize: 15, fontWeight: 500, color: '#475569' }}>Каналы</a>
-          <a href="#calculator" style={{ fontSize: 15, fontWeight: 500, color: '#475569' }}>Калькулятор</a>
+          <a href="#channels" className="nav-hide-mobile" style={{ fontSize: 15, fontWeight: 500, color: '#475569' }}>Каналы</a>
+          <a href="#calculator" className="nav-hide-mobile" style={{ fontSize: 15, fontWeight: 500, color: '#475569' }}>Калькулятор</a>
           <a href="#pricing" style={{ fontSize: 15, fontWeight: 500, color: '#475569' }}>Тарифы</a>
-          <a href="/admin" style={{ padding: '10px 24px', borderRadius: 8, background: '#3B82F6', color: '#fff', fontWeight: 600, fontSize: 14 }}>
+          <a href="/admin" style={{ padding: '12px 24px', borderRadius: 8, background: '#3B82F6', color: '#fff', fontWeight: 600, fontSize: 14 }}>
             Войти
           </a>
         </div>
@@ -212,7 +224,7 @@ export default function LandingApp() {
         <div style={{ display: 'inline-block', padding: '6px 16px', borderRadius: 20, background: '#EFF6FF', color: '#2563EB', fontSize: 13, fontWeight: 600, marginBottom: 24, border: '1px solid #DBEAFE' }}>
           Интеллектуальный SaaS для ветеринарных клиник
         </div>
-        <h1 style={{ fontSize: 'clamp(40px, 6vw, 64px)', fontWeight: 800, lineHeight: 1.15, marginBottom: 24, color: '#0F172A', letterSpacing: '-0.02em' }}>
+        <h1 className="landing-h1" style={{ fontSize: 'clamp(36px, 6vw, 64px)', fontWeight: 800, lineHeight: 1.15, marginBottom: 24, color: '#0F172A', letterSpacing: '-0.02em' }}>
           AI-ассистент для вашей{' '}
           <span style={{ color: '#3B82F6' }}>
             ветклиники
@@ -241,10 +253,10 @@ export default function LandingApp() {
       {/* Channels */}
       <section id="channels" style={{ padding: '0 20px 80px', maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <h2 style={{ fontSize: 28, fontWeight: 800, color: '#0F172A', marginBottom: 12, letterSpacing: '-0.01em' }}>
+          <h2 style={{ fontSize: 'clamp(22px, 3.5vw, 28px)', fontWeight: 800, color: '#0F172A', marginBottom: 12, letterSpacing: '-0.01em' }}>
             Работает там, где удобно клиенту
           </h2>
-          <p style={{ color: '#475569', fontSize: 16, maxWidth: 520, margin: '0 auto' }}>
+          <p style={{ color: '#475569', fontSize: 15, maxWidth: 520, margin: '0 auto' }}>
             Один AI-ассистент — три канала. Подключите нужные или все сразу.
           </p>
         </div>
@@ -272,8 +284,8 @@ export default function LandingApp() {
       {/* Features */}
       <section id="features" style={{ padding: '80px 20px', maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 60 }}>
-          <h2 style={{ fontSize: 36, fontWeight: 800, marginBottom: 16, color: '#0F172A', letterSpacing: '-0.01em' }}>Что получает ваша клиника</h2>
-          <p style={{ color: '#475569', fontSize: 16, maxWidth: 600, margin: '0 auto' }}>Всё необходимое для автоматизации первичных обращений и снижения нагрузки на администраторов.</p>
+          <h2 className="landing-section-h2" style={{ fontSize: 36, fontWeight: 800, marginBottom: 16, color: '#0F172A', letterSpacing: '-0.01em' }}>Что получает ваша клиника</h2>
+          <p style={{ color: '#475569', fontSize: 15, maxWidth: 600, margin: '0 auto' }}>Всё необходимое для автоматизации первичных обращений и снижения нагрузки на администраторов.</p>
         </div>
         <div className="landing-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
           {FEATURES.map((f) => (
@@ -292,7 +304,7 @@ export default function LandingApp() {
       <section style={{ padding: '80px 20px', background: '#ffffff', borderTop: '1px solid #E2E8F0', borderBottom: '1px solid #E2E8F0' }}>
         <div style={{ maxWidth: 800, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 60 }}>
-            <h2 style={{ fontSize: 36, fontWeight: 800, marginBottom: 16, color: '#0F172A', letterSpacing: '-0.01em' }}>Как это работает</h2>
+            <h2 className="landing-section-h2" style={{ fontSize: 36, fontWeight: 800, marginBottom: 16, color: '#0F172A', letterSpacing: '-0.01em' }}>Как это работает</h2>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
             {[
@@ -315,7 +327,7 @@ export default function LandingApp() {
                 </div>
                 <div style={{ paddingTop: 10 }}>
                   <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8, color: '#0F172A' }}>{step.title}</div>
-                  <div style={{ fontSize: 16, color: '#475569', lineHeight: 1.6 }}>{step.desc}</div>
+                  <div style={{ fontSize: 15, color: '#475569', lineHeight: 1.6 }}>{step.desc}</div>
                 </div>
               </div>
             ))}
@@ -329,14 +341,14 @@ export default function LandingApp() {
       {/* Pricing */}
       <section id="pricing" style={{ padding: '80px 20px', maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 60 }}>
-          <h2 style={{ fontSize: 36, fontWeight: 800, marginBottom: 16, color: '#0F172A', letterSpacing: '-0.01em' }}>Тарифы</h2>
-          <p style={{ color: '#475569', fontSize: 16, maxWidth: 640, margin: '0 auto' }}>
+          <h2 className="landing-section-h2" style={{ fontSize: 36, fontWeight: 800, marginBottom: 16, color: '#0F172A', letterSpacing: '-0.01em' }}>Тарифы</h2>
+          <p style={{ color: '#475569', fontSize: 15, maxWidth: 640, margin: '0 auto' }}>
             Единая подписка для клиник любого размера. Расходы на базовый AI уже включены в пакет.
           </p>
         </div>
         <div className="landing-pricing-grid">
           {PLANS.map((plan) => (
-             <div key={plan.name} className="card" style={{
+             <div key={plan.name} className="pricing-card card" style={{
               padding: 40, borderRadius: 20,
               background: '#ffffff',
               border: `2px solid ${plan.popular ? '#3B82F6' : '#E2E8F0'}`,
@@ -390,7 +402,7 @@ export default function LandingApp() {
         <div className="landing-cta-box" style={{ maxWidth: 700, margin: '0 auto', padding: '64px 40px', borderRadius: 24, background: '#0F172A', color: '#fff', boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.25)' }}>
           <div style={{ fontSize: 48, marginBottom: 24 }}>🐾</div>
           <h2 className="landing-cta-title" style={{ fontSize: 32, fontWeight: 800, marginBottom: 16, letterSpacing: '-0.01em' }}>Готовы автоматизировать приём?</h2>
-          <p style={{ color: '#94A3B8', fontSize: 18, marginBottom: 32, maxWidth: 480, margin: '0 auto 32px' }}>
+          <p style={{ color: '#94A3B8', fontSize: 17, marginBottom: 32, maxWidth: 480, margin: '0 auto 32px' }}>
             Начните бесплатный 7-дневный период. Настройка займет не более 5 минут.
           </p>
           <a href="/admin" style={{ display: 'inline-block', padding: '16px 40px', borderRadius: 10, background: '#F97316', color: '#fff', fontWeight: 700, fontSize: 16, boxShadow: '0 8px 20px -6px rgba(249, 115, 22, 0.4)' }}>
@@ -401,7 +413,7 @@ export default function LandingApp() {
 
       {/* Footer */}
       <footer style={{ padding: '40px 20px', borderTop: '1px solid #E2E8F0', background: '#ffffff' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
+        <div className="landing-footer-inner" style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
           <div style={{ color: '#64748B', fontSize: 14, fontWeight: 500 }}>
             © {new Date().getFullYear()} AI-Ветеринар · Умная платформа для ветклиник
           </div>
