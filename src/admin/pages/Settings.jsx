@@ -81,7 +81,10 @@ function ProfileTab({ clinic, setClinic, onSave, saving }) {
     const slug = (clinic.slug || '').trim();
     if (slug.length < 3) { setSlugError('Минимум 3 символа'); return; }
     if (!/^[a-z0-9][a-z0-9-]*[a-z0-9]$/.test(slug)) { setSlugError('Только латиница, цифры и дефис. Без пробелов.'); return; }
-    onSave({ name: clinic.name, slug, phone: clinic.phone, city: clinic.city, address: clinic.address });
+    onSave({
+      name: clinic.name, slug, phone: clinic.phone, city: clinic.city, address: clinic.address,
+      settings: { ...(clinic.settings || {}), avg_visit_cost: Number(clinic.settings?.avg_visit_cost) || 0 },
+    });
   };
 
   return (
@@ -110,6 +113,11 @@ function ProfileTab({ clinic, setClinic, onSave, saving }) {
       <div className="form-group">
         <label className="label">Адрес</label>
         <input className="input" value={clinic.address || ''} onChange={update('address')} />
+      </div>
+      <div className="form-group">
+        <label className="label">Средняя стоимость приёма (₽)</label>
+        <input className="input" type="number" value={clinic.settings?.avg_visit_cost || ''} onChange={(e) => setClinic({ ...clinic, settings: { ...(clinic.settings || {}), avg_visit_cost: e.target.value } })} placeholder="2500" />
+        <div style={{ fontSize: 11, color: '#546E7A', marginTop: 4 }}>Используется для расчёта примерного дохода от записей через AI</div>
       </div>
       <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
         {saving ? 'Сохранение...' : 'Сохранить'}

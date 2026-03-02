@@ -71,26 +71,53 @@ export default function Billing() {
       </div>
 
       {/* Balance + Value Stats */}
-      <div className="stat-grid">
-        <div className="stat-card">
-          <div className="stat-value" style={{ color: (balance?.balance_rub ?? 0) > 0 ? '#00E676' : '#FF5252' }}>
-            {balance?.balance_rub ?? 0} ₽
-          </div>
-          <div className="stat-label">Баланс</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-value">
-            {analytics?.conversations ?? 0}
-          </div>
-          <div className="stat-label">Диалогов за месяц</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-value" style={{ color: '#00E676' }}>
-            {analytics?.appointments ?? 0}
-          </div>
-          <div className="stat-label">Доп. клиентов (записи)</div>
-        </div>
-      </div>
+      {(() => {
+        const appointments = analytics?.appointments ?? 0;
+        const avgCost = Number(clinic?.settings?.avg_visit_cost) || 0;
+        const estimatedRevenue = appointments * avgCost;
+        return (
+          <>
+            <div className="stat-grid">
+              <div className="stat-card">
+                <div className="stat-value" style={{ color: (balance?.balance_rub ?? 0) > 0 ? '#00E676' : '#FF5252' }}>
+                  {balance?.balance_rub ?? 0} ₽
+                </div>
+                <div className="stat-label">Баланс</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-value">
+                  {analytics?.conversations ?? 0}
+                </div>
+                <div className="stat-label">Диалогов за месяц</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-value" style={{ color: '#00E676' }}>
+                  {appointments}
+                </div>
+                <div className="stat-label">Доп. клиентов (записи)</div>
+              </div>
+            </div>
+            {appointments > 0 && avgCost > 0 && (
+              <div className="card" style={{ background: 'linear-gradient(135deg, rgba(0,230,118,0.06), rgba(0,200,83,0.03))', border: '1px solid rgba(0,230,118,0.2)', textAlign: 'center', padding: '20px 24px' }}>
+                <div style={{ fontSize: 12, color: '#69F0AE', textTransform: 'uppercase', letterSpacing: 1, fontFamily: "'JetBrains Mono', monospace", marginBottom: 8 }}>Примерный доп. доход от AI</div>
+                <div style={{ fontSize: 28, fontWeight: 800, color: '#00E676' }}>
+                  ~{estimatedRevenue.toLocaleString('ru-RU')} ₽
+                </div>
+                <div style={{ fontSize: 12, color: '#546E7A', marginTop: 6 }}>
+                  {appointments} записей × {avgCost.toLocaleString('ru-RU')} ₽ (ср. стоимость приёма)
+                </div>
+              </div>
+            )}
+            {appointments > 0 && !avgCost && (
+              <div className="card" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', textAlign: 'center', padding: '16px 24px' }}>
+                <div style={{ fontSize: 13, color: '#90A4AE' }}>
+                  Укажите среднюю стоимость приёма в <b style={{ color: '#B388FF', cursor: 'pointer' }}>Настройках → Профиль</b>, чтобы видеть расчёт дохода от AI-записей
+                </div>
+              </div>
+            )}
+          </>
+        );
+      })()}
 
       {/* Top Up */}
       <TopUpCard onRefreshBalance={refreshBalance} />
