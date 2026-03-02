@@ -257,6 +257,7 @@ router.post('/:slug/appointment', async (req, res) => {
       owner_name: ownerName,
       contact_method: contactMethod,
       contact_value: contactValue,
+      pet_card: petCard || null,
       tg_chat_ids: clinic.tg_chat_ids,
       max_bot_token_encrypted: clinic.max_bot_token_encrypted || null,
       max_chat_id: clinic.max_chat_id || null,

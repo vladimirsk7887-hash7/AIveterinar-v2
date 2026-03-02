@@ -49,7 +49,7 @@ export function setupEventListeners(config) {
 
   // Send appointment notifications via Telegram and Max
   eventBus.on('appointment.created', async (data) => {
-    const { owner_name, contact_method, contact_value, summary, tg_chat_ids, max_bot_token_encrypted, max_chat_id } = data;
+    const { owner_name, contact_method, contact_value, pet_card, summary, tg_chat_ids, max_bot_token_encrypted, max_chat_id } = data;
 
     logger.info({
       hasTgChatIds: !!(tg_chat_ids?.length),
@@ -59,12 +59,32 @@ export function setupEventListeners(config) {
       maxChatId: max_chat_id || null,
     }, 'appointment.created — notification check');
 
-    const text = [
-      '🐾 **Новая запись на приём**',
-      `**Владелец:** ${owner_name}`,
-      `**Контакт:** ${contact_method} — ${contact_value}`,
-      summary ? `\n${summary}` : '',
+    // Format contact method label
+    const contactLabel = contact_method === 'telegram' ? 'Telegram'
+      : contact_method === 'max' ? 'Max'
+        : contact_method === 'phone' ? 'Телефон' : contact_method;
+
+    // Build patient card block
+    const card = pet_card || {};
+    const cardLines = [
+      card.name && `Имя: ${card.name}`,
+      card.species && `Вид: ${card.species}`,
+      card.breed && `Порода: ${card.breed}`,
+      card.age && `Возраст: ${card.age}`,
+      card.weight && `Вес: ${card.weight}`,
+      card.symptoms?.length && `Симптомы: ${card.symptoms.join(', ')}`,
+      card.notes && `Заметки: ${card.notes}`,
     ].filter(Boolean).join('\n');
+
+    const text = [
+      '🏥 **НОВАЯ ЗАПИСЬ НА ПРИЁМ**',
+      '',
+      `👤 **Владелец:** ${owner_name}`,
+      `📱 **${contactLabel}:** ${contact_value}`,
+      cardLines ? `\n🐾 **Пациент:**\n${cardLines}` : '',
+      summary ? `\n📋 **Саммари:**\n${summary}` : '',
+      '\n🕐 _Отправлено через AI-Ветеринар_',
+    ].filter(v => v !== '').join('\n');
 
     // Telegram notification
     if (tg_chat_ids?.length) {

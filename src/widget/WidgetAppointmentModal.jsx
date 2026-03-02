@@ -69,8 +69,8 @@ export default function WidgetAppointmentModal({ pet, messages, onClose }) {
 
     setSummaryText(fullMessage);
 
-    // Send via widget appointment API
-    const sent = await sendToTelegram(fullMessage, {
+    // Send via widget appointment API (pass only AI summary, not the full formatted message)
+    const sent = await sendToTelegram(summary, {
       ownerName,
       contactMethod,
       contactValue,
