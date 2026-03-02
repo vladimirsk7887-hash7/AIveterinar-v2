@@ -67,7 +67,7 @@ export async function callAI(messages, _systemOverride, petId) {
     if (!response.ok) {
       return `Ошибка API (${response.status}): ${data.error || 'Неизвестная ошибка'}`;
     }
-    return data.text || 'Произошла ошибка.';
+    return data.visibleText || data.text || 'Произошла ошибка.';
   } catch {
     return 'Ошибка соединения. Проверьте интернет.';
   }
