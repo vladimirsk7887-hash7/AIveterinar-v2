@@ -84,12 +84,6 @@ export default function Billing() {
         </div>
         <div className="stat-card">
           <div className="stat-value" style={{ fontSize: 20 }}>
-            {usage?.tokens_total ? `${Math.round(usage.tokens_total / 1000)}K` : '—'}
-          </div>
-          <div className="stat-label">Токенов использовано</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-value" style={{ fontSize: 20 }}>
             {usage?.cost_rub ? `${usage.cost_rub.toFixed(0)} ₽` : '—'}
           </div>
           <div className="stat-label">Расходы на AI</div>

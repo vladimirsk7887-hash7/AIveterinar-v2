@@ -15,8 +15,6 @@ const EVENT_CONFIG = {
     describe: (d) => {
       const parts = [];
       if (d.model) parts.push(d.model);
-      if (d.tokens) parts.push(`${d.tokens} tok`);
-      if (d.costRub) parts.push(`${d.costRub} ₽`);
       return parts.join(' · ') || null;
     },
   },

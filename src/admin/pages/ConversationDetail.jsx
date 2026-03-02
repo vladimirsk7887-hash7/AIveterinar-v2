@@ -27,9 +27,6 @@ export default function ConversationDetail({ id, onBack }) {
   const statusInfo = STATUS_MAP[conv.status] || STATUS_MAP.consultation;
   const messages = conv.messages || [];
 
-  // Calculate total tokens from messages
-  const totalTokens = messages.reduce((sum, m) => sum + (m.tokens_input || 0) + (m.tokens_output || 0), 0);
-
   return (
     <div>
       <button className="btn btn-outline" onClick={onBack} style={{ marginBottom: 20 }}>
@@ -78,12 +75,6 @@ export default function ConversationDetail({ id, onBack }) {
         <div className="stat-card">
           <div className="stat-value">{messages.length}</div>
           <div className="stat-label">Сообщений</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-value" style={{ fontSize: 20 }}>
-            {totalTokens ? `${Math.round(totalTokens / 1000)}K` : '—'}
-          </div>
-          <div className="stat-label">Токенов</div>
         </div>
       </div>
 
