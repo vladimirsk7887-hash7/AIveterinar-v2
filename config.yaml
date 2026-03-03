@@ -10,7 +10,7 @@ platform:
 # ─── AI ПРОВАЙДЕРЫ ───────────────────────────────────────
 ai:
   default_provider: "routerai"
-  default_model: "qwen/qwen3.5-35b-a3b"
+  default_model: "yandex/gpt-pro-5.1"
   max_completion_tokens: 1000
 
   providers:
@@ -18,8 +18,12 @@ ai:
       enabled: true
       base_url: "https://routerai.ru/api/v1"
       models:
+        - id: "yandex/gpt-pro-5.1"
+          name: "YandexGPT Pro 5.1"
+          input_cost_rub: 531
+          output_cost_rub: 531
         - id: "qwen/qwen3.5-35b-a3b"
-          name: "Qwen3.5 35B (быстрый, дешевый)"
+          name: "Qwen3.5 35B"
           input_cost_rub: 2
           output_cost_rub: 9
         - id: "qwen/qwen3-235b-a22b"
