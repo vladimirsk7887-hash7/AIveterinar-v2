@@ -3,18 +3,33 @@ import { api } from '../lib/api.js';
 
 const STATUSES = [
   { key: '', label: 'Все' },
-  { key: 'pending', label: 'Ожидают' },
+  { key: 'new', label: 'Новые' },
   { key: 'confirmed', label: 'Подтверждены' },
   { key: 'completed', label: 'Завершены' },
   { key: 'cancelled', label: 'Отменены' },
 ];
 
 const STATUS_BADGE = {
+  new: 'badge-blue',
   pending: 'badge-yellow',
   confirmed: 'badge-blue',
   completed: 'badge-green',
   cancelled: 'badge-red',
 };
+
+const STATUS_LABEL = {
+  new: 'Новая',
+  pending: 'Ожидает',
+  confirmed: 'Подтверждена',
+  completed: 'Завершена',
+  cancelled: 'Отменена',
+};
+
+function petInfo(a) {
+  const card = a.pet_card || {};
+  const parts = [card.name, card.species, card.breed].filter(Boolean);
+  return parts.length > 0 ? parts.join(', ') : '—';
+}
 
 export default function Appointments() {
   const [appointments, setAppointments] = useState([]);
@@ -86,15 +101,15 @@ export default function Appointments() {
                     <div style={{ fontSize: 12 }}>{a.contact_value || '—'}</div>
                     {a.contact_method && <div style={{ fontSize: 10, color: '#546E7A' }}>{a.contact_method}</div>}
                   </td>
-                  <td>{a.summary ? a.summary.substring(0, 50) + (a.summary.length > 50 ? '...' : '') : '—'}</td>
+                  <td style={{ fontSize: 13 }}>{petInfo(a)}</td>
                   <td>
                     <span className={`badge ${STATUS_BADGE[a.status] || 'badge-blue'}`}>
-                      {a.status || '—'}
+                      {STATUS_LABEL[a.status] || a.status || '—'}
                     </span>
                   </td>
                   <td>
                     <div style={{ display: 'flex', gap: 6 }}>
-                      {a.status === 'pending' && (
+                      {(a.status === 'new' || a.status === 'pending') && (
                         <>
                           <button className="btn btn-outline" style={{ padding: '3px 10px', fontSize: 10 }} onClick={() => updateStatus(a.id, 'confirmed')}>
                             Подтвердить
