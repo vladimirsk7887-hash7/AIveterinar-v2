@@ -15,12 +15,13 @@ export async function callRouterAI({ messages, system, model, maxTokens, apiKey,
     body: JSON.stringify({
       model,
       max_tokens: maxTokens,
+      enable_thinking: false,
       messages: [
         { role: 'system', content: system },
         ...messages,
       ],
     }),
-    signal: AbortSignal.timeout(5000),
+    signal: AbortSignal.timeout(15000),
   });
 
   const data = await response.json();
