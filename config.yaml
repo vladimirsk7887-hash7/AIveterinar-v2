@@ -10,7 +10,7 @@ platform:
 # ─── AI ПРОВАЙДЕРЫ ───────────────────────────────────────
 ai:
   default_provider: "routerai"
-  default_model: "deepseek/deepseek-chat-v3-0324"
+  default_model: "qwen/qwen3.5-35b-a3b"
   max_completion_tokens: 1000
 
   providers:
@@ -18,8 +18,16 @@ ai:
       enabled: true
       base_url: "https://routerai.ru/api/v1"
       models:
+        - id: "qwen/qwen3.5-35b-a3b"
+          name: "Qwen3.5 35B (быстрый, дешевый)"
+          input_cost_rub: 2
+          output_cost_rub: 9
+        - id: "qwen/qwen3-235b-a22b"
+          name: "Qwen3 235B"
+          input_cost_rub: 20
+          output_cost_rub: 30
         - id: "deepseek/deepseek-chat-v3-0324"
-          name: "DeepSeek V3.2 (быстрый, дешевый)"
+          name: "DeepSeek V3.2"
           input_cost_rub: 25
           output_cost_rub: 37
         - id: "openai/gpt-5"
@@ -40,6 +48,14 @@ ai:
       base_url: "https://openrouter.ai/api/v1"
       proxy: ""
       models:
+        - id: "qwen/qwen3.5-35b-a3b"
+          name: "Qwen3.5 35B (OpenRouter fallback)"
+          input_cost_usd: 0.00000025
+          output_cost_usd: 0.000001
+        - id: "qwen/qwen3-235b-a22b:free"
+          name: "Qwen3 235B (OpenRouter fallback)"
+          input_cost_usd: 0
+          output_cost_usd: 0
         - id: "deepseek/deepseek-chat-v3-0324"
           name: "DeepSeek V3 (OpenRouter)"
           input_cost_usd: 0.00014

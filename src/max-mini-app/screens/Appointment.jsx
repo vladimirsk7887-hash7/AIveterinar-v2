@@ -19,12 +19,12 @@ export default function Appointment({ chatState, userName, onBack }) {
         ?.map((m) => `${m.role === 'user' ? 'Владелец' : 'AI-Ветеринар'}: ${m.displayText || m.content}`)
         .join('\n') || '';
 
-      let summary = await callAI(
+      const summaryResult = await callAI(
         [{ role: 'user', content: historyText }],
         SUMMARY_PROMPT,
       );
-      const { visibleText } = parseMeta(summary || '');
-      summary = visibleText?.trim() || '';
+      const { visibleText } = parseMeta(summaryResult?.text || '');
+      let summary = visibleText?.trim() || '';
       if (!summary || summary.startsWith('Ошибка') || summary.startsWith('{')) summary = 'Саммари недоступно';
 
       const statusEmoji = chatState?.status === 'red' ? '🔴'
