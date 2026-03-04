@@ -10,7 +10,7 @@ platform:
 # ─── AI ПРОВАЙДЕРЫ ───────────────────────────────────────
 ai:
   default_provider: "routerai"
-  default_model: "yandex/gpt-pro-5.1"
+  default_model: "deepseek/deepseek-chat-v3-0324"
   max_completion_tokens: 1000
 
   providers:
