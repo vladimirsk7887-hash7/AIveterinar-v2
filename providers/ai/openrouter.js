@@ -20,7 +20,6 @@ export async function callOpenRouter({ messages, system, model, maxTokens, apiKe
     body: JSON.stringify({
       model,
       max_tokens: maxTokens,
-      enable_thinking: false,
       messages: [
         { role: 'system', content: system },
         ...messages,
