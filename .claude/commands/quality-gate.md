@@ -1,0 +1,1 @@
+Run the saas-quality-gate skill on this project. Execute ALL 33 checks from the checklist against the current codebase. Output a full structured report with Pass/Fail/Warning for each check, file:line references for failures, and a summary with critical issues that must be fixed before deploy.

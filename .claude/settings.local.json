@@ -1,4 +1,7 @@
 {
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
   "permissions": {
     "allow": [
       "WebFetch(domain:github.com)",
@@ -12,7 +15,30 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(openssl s_client:*)",
-      "Bash(where:*)"
+      "Bash(where:*)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(d\\)\")",
+      "Bash(gh run list --limit 2)",
+      "Bash(python3 -c \"import json,sys; p=json.load\\(sys.stdin\\); deps={**p.get\\(''dependencies'',{}\\), **p.get\\(''devDependencies'',{}\\)}; [print\\(k,v\\) for k,v in deps.items\\(\\)]\")",
+      "Bash(\"/c/Program Files/PuTTY/plink\" -pw \"gW-+d-WA.*63AE\" -batch -hostkey \"ssh-ed25519 255 SHA256:V7RAVhMD49R3x+6guiryjbEdBxwqYBFn5PQvhRLywJc\" root@188.225.87.99 \"docker logs coolify 2>&1 | grep -i ''w4cwwc\\\\|multer\\\\|error\\\\|fail\\\\|ik8wo'' | tail -20\")",
+      "Bash(\"/c/Program Files/PuTTY/plink\" -pw \"gW-+d-WA.*63AE\" -batch -hostkey \"ssh-ed25519 255 SHA256:V7RAVhMD49R3x+6guiryjbEdBxwqYBFn5PQvhRLywJc\" root@188.225.87.99 \"docker logs coolify 2>&1 | tail -50\")",
+      "Bash(npm test)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:dev.max.ru)",
+      "Bash(python \"C:/Users/UsER/.claude/skills/ui-ux-pro-max/scripts/search.py\" \"veterinary healthcare AI chat mobile dark\" --design-system -p \"AI-Ветеринар Max\")",
+      "Bash(xargs grep -l \"admin-sidebar\\\\|sidebar-overlay\\\\|mobile-topbar\")",
+      "Bash(xargs grep -n \"z-index\\\\|sidebar\")",
+      "Bash(grep -n \"appointment.created\\\\|sendTelegram\\\\|notifyClinic\\\\|tg_chat\" server.js routes/*.js services/*.js)",
+      "Skill(commit-commands:commit-push-pr)",
+      "Skill(commit-commands:commit-push-pr:*)",
+      "Bash(\"/c/Program Files/PuTTY/plink\" -pw \"gW-+d-WA.*63AE\" -batch -hostkey \"ssh-ed25519 255 SHA256:V7RAVhMD49R3x+6guiryjbEdBxwqYBFn5PQvhRLywJc\" root@188.225.87.99 \"docker ps --format ''{{.Names}}'' | grep -i ''aivet\\\\|vet\\\\|coolify'' | head -10\")",
+      "Bash(\"/c/Program Files/PuTTY/plink\" -pw \"gW-+d-WA.*63AE\" -batch -hostkey \"ssh-ed25519 255 SHA256:V7RAVhMD49R3x+6guiryjbEdBxwqYBFn5PQvhRLywJc\" root@188.225.87.99 \"docker ps --format ''{{.Names}}\\\\t{{.Image}}'' | grep -v coolify\")",
+      "Bash(\"/c/Program Files/PuTTY/plink\" -pw \"gW-+d-WA.*63AE\" -batch -hostkey \"ssh-ed25519 255 SHA256:V7RAVhMD49R3x+6guiryjbEdBxwqYBFn5PQvhRLywJc\" root@188.225.87.99 \"ls /var/lib/docker/containers/\")",
+      "Bash(\"/c/Program Files/PuTTY/plink\" -pw \"gW-+d-WA.*63AE\" -batch -hostkey \"ssh-ed25519 255 SHA256:V7RAVhMD49R3x+6guiryjbEdBxwqYBFn5PQvhRLywJc\" root@188.225.87.99 \"grep -l ''appointment\\\\|sendMax\\\\|Max token'' /var/lib/docker/containers/6773106a9b9fedbdc9d6f509439019e9b9f85ed34c55b4fc2a19671351875d89/6773106a9b9fedbdc9d6f509439019e9b9f85ed34c55b4fc2a19671351875d89-json.log /var/lib/docker/containers/58311193a52b82c9eef5026305bac63c6cce3e9b4e4d26aaf635019d97c83797/58311193a52b82c9eef5026305bac63c6cce3e9b4e4d26aaf635019d97c83797-json.log /var/lib/docker/containers/2f148c61c502fd653e78252c3d40ec36bb7a51a867b68485997107f61a0a550a/2f148c61c502fd653e78252c3d40ec36bb7a51a867b68485997107f61a0a550a-json.log 2>/dev/null\")",
+      "Bash(\"/c/Program Files/PuTTY/plink\" -pw \"gW-+d-WA.*63AE\" -batch -hostkey \"ssh-ed25519 255 SHA256:V7RAVhMD49R3x+6guiryjbEdBxwqYBFn5PQvhRLywJc\" root@188.225.87.99 \"ls -la /proc/101733/fd 2>/dev/null | head -10; cat /proc/101733/cmdline 2>/dev/null | tr ''\\\\0'' '' ''\")",
+      "WebFetch(domain:openrouter.ai)"
     ]
+  },
+  "preferences": {
+    "tmuxSplitPanes": true
   }
 }
